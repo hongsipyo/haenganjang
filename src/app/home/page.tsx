@@ -27,7 +27,7 @@ import {
   getFilledEpisodes,
   getTotalFragments,
   getTotalCharacters,
-  EPISODES,
+  PLOT_BEATS,
 } from "@/lib/data";
 
 const ENCOURAGEMENTS = [
@@ -122,8 +122,8 @@ export default function HomePage() {
           },
           {
             icon: Layers,
-            label: "채워진 회차",
-            value: `${filledEpisodes}/16`,
+            label: "플롯 비트",
+            value: `${filledEpisodes}/${PLOT_BEATS.length}`,
             bg: "bg-emerald-50",
             color: "text-emerald-500",
             border: "border-emerald-100",
@@ -162,63 +162,53 @@ export default function HomePage() {
         ))}
       </section>
 
-      {/* ── 16부작 진행률 Grid ── */}
+      {/* ── 플롯 진행률 ── */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-amber-700/80 uppercase tracking-wider">
-            16챕터 진행률
+            플롯 진행률
           </h2>
           <span className="text-xs text-rose-400/70">
-            {filledEpisodes}개 시작됨 -- 잘 하고 있어!
+            {filledEpisodes}개 비트 시작됨
           </span>
         </div>
-        <div className="grid grid-cols-4 gap-3">
-          {EPISODES.map((ep) => {
-            const isFilled =
-              ep.title !== null ||
-              ep.synopsis !== null ||
-              ep.scenes.length > 0;
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {PLOT_BEATS.map((beat) => {
+            const actColors: Record<string, string> = {
+              "발단": "text-amber-700 bg-amber-50 border-amber-200/60",
+              "전개": "text-blue-700 bg-blue-50 border-blue-200/60",
+              "위기": "text-rose-700 bg-rose-50 border-rose-200/60",
+              "절정": "text-red-700 bg-red-50 border-red-200/60",
+              "결말": "text-emerald-700 bg-emerald-50 border-emerald-200/60",
+            };
+            const colorClass = actColors[beat.act] || "text-gray-700 bg-gray-50 border-gray-200/60";
             return (
               <Card
-                key={ep.number}
-                className={`relative overflow-hidden transition-all duration-300 ${
-                  isFilled
-                    ? "bg-white border-rose-200/60 shadow-md shadow-rose-100/50"
-                    : "bg-amber-50/50 border-dashed border-amber-200/60"
-                }`}
+                key={beat.id}
+                className={`relative overflow-hidden transition-all duration-300 ${colorClass} shadow-sm`}
               >
                 <CardContent className="p-3 space-y-2">
                   <div className="flex items-baseline justify-between">
-                    <span
-                      className={`text-xs font-medium ${
-                        isFilled ? "text-rose-700" : "text-amber-400"
-                      }`}
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-1.5 py-0 border-0 bg-white/60"
                     >
-                      {ep.number}부
-                    </span>
-                    {ep.progress > 0 && (
+                      {beat.act}
+                    </Badge>
+                    {beat.progress > 0 && (
                       <Badge
                         variant="secondary"
                         className="text-[10px] px-1.5 py-0 bg-amber-100 text-amber-700 border-0"
                       >
-                        {ep.progress}%
+                        {beat.progress}%
                       </Badge>
                     )}
                   </div>
-                  {isFilled ? (
-                    <p className="text-xs text-gray-600 truncate leading-relaxed">
-                      {ep.title || ep.firstLine || "untitled"}
-                    </p>
-                  ) : (
-                    <p className="text-[11px] text-amber-300 italic">
-                      여기 채워질 거야
-                    </p>
-                  )}
-                  <Progress value={ep.progress} className="h-1" />
+                  <p className="text-xs font-medium truncate leading-relaxed">
+                    {beat.title}
+                  </p>
+                  <Progress value={beat.progress} className="h-1" />
                 </CardContent>
-                {isFilled && ep.progress > 0 && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent pointer-events-none" />
-                )}
               </Card>
             );
           })}
@@ -334,7 +324,7 @@ export default function HomePage() {
                 </h3>
               </div>
               <p className="text-xs text-gray-500">
-                액션 코미디 16챕터 &middot; 관료 vs 관료
+                액션 코미디 &middot; 관료 vs 관료
               </p>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-gray-500">

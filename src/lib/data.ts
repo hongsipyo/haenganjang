@@ -245,101 +245,165 @@ export const CHARACTERS: CharacterData[] = [
 ];
 
 // ============================================================
-// EPISODES (챕터 구조)
+// PLOT BEATS (플롯 비트 구조 — 5막)
 // ============================================================
-export const EPISODES: EpisodeData[] = [
+export interface PlotBeat {
+  id: string;
+  act: "발단" | "전개" | "위기" | "절정" | "결말";
+  title: string;
+  description: string;
+  scenes: { title: string; content: string }[];
+  progress: number;
+}
+
+export interface PlatformPlan {
+  platform: "영화" | "웹툰" | "웹소설";
+  totalLength: string;
+  pacing: string;
+  beats: string[];
+  notes: string;
+}
+
+export const PLOT_BEATS: PlotBeat[] = [
   {
-    number: 1,
+    id: "b1",
+    act: "발단",
     title: "팬티 찢김",
-    firstLine: "김형식은 규칙적이다",
-    synopsis: "김형식이 국무회의에서 기재부장관 문형철에게 팬티를 찢긴다. 여자 장관들, 직원들 보는 앞에서. 인명피해 없는 사고로 시작. 마지막에 팬티 찢지 말라고 협상하고 얼굴에 흙뿌림.",
-    focusCharacter: "김형식",
+    description: "국무회의에서 기재부장관 문형철에게 팬티를 찢기는 수모. 여자 장관들, 직원들 앞에서. 협상했지만 얼굴에 흙뿌림.",
     scenes: [
       { title: "국무회의 시작", content: "평범한 국무회의. 예산안 심의. 김형식 발언 중 문형철이 끼어듦" },
       { title: "팬티 찢김", content: "여자 장관들, 직원들 보는 앞에서 팬티가 찢긴다. 인명피해 없음. 수치심만." },
-      { title: "협상", content: "팬티 찢지 말라고 협상. 문형철이 얼굴에 흙을 뿌림. 김형식 무력함." },
-    ],
-    keyFragments: [
-      "팬티 찢는것도 여자 장관들 직원들 보는앞에서 찢는걸로",
-      "팬티 찢지 마십시오. 이것은 협상입니다.",
+      { title: "협상 실패", content: "팬티 찢지 말라고 협상. 문형철이 얼굴에 흙을 뿌림. 김형식 무력함." },
     ],
     progress: 15,
   },
   {
-    number: 2,
-    title: "작은 일을 키우는 문형철",
-    firstLine: "김형식은 분노한다",
-    synopsis: "문형철이 작은 일을 키운다. 김형식이 분노하여 책상을 치는데 책상이 부러진다. 봉인된 힘이 새어나온 것. 의식을 잃는다.",
-    focusCharacter: "김형식/문형철",
+    id: "b2",
+    act: "발단",
+    title: "반복되는 굴욕",
+    description: "마이크 끄기, 제로콜라 라벨에 설탕콜라(당뇨 쇼크), 골프 모임 소외. 작은 일을 키우는 문형철의 패턴.",
+    scenes: [
+      { title: "마이크 끄기", content: "국무회의에서 김형식 발언 중 마이크가 꺼진다. 문형철 측근의 소행." },
+      { title: "설탕콜라", content: "제로콜라 라벨에 설탕콜라. 당뇨인 김형식 쇼크." },
+      { title: "골프 소외", content: "장관들 골프 모임에서 김형식만 빠짐. 혼자 청사에 남는 오후." },
+    ],
+    progress: 10,
+  },
+  {
+    id: "b3",
+    act: "전개",
+    title: "책상 부러짐",
+    description: "분노한 김형식이 책상을 치는데 책상이 부러진다. 봉인된 힘이 새어나온 첫 순간. 의식을 잃는다.",
     scenes: [
       { title: "기재부의 도발", content: "문형철이 사소한 행정 문제를 국가 위기로 확대" },
       { title: "책상 부러짐", content: "김형식이 책상을 치는데 책상이 부러진다. 주변 사람들 경악." },
       { title: "의식 상실", content: "봉인된 힘이 새어나옴. 김형식 쓰러짐." },
     ],
-    keyFragments: [
-      "책상을 쳤는데 책상이 부러짐. 의식 잃음.",
-    ],
     progress: 10,
   },
   {
-    number: 3,
-    title: "봉인과 화기운",
-    firstLine: "김형식은 봉인되어 있다",
-    synopsis: "혈이 봉인되어 있어서 뚫어야 한다는 사실을 알게 됨. 화기운 보충제. 남자답게 행동하기 시작. 하지만 약빨 떨어지면 속수무책.",
-    focusCharacter: "김형식",
+    id: "b4",
+    act: "전개",
+    title: "힘 깨우기",
+    description: "혈 봉인 해제, 화기운 보충제 복용, 한전사장에게 전기충격. 언어가 '나쁜 사람'에서 욕으로 변한다. 테이저건 확보.",
     scenes: [
       { title: "봉인의 진실", content: "혈이 봉인되어 있다는 사실을 알게 됨. 어렸을 때 사람을 죽일 수도 있어서 봉인" },
-      { title: "화기운 보충제", content: "화기운 보충. 남자답게 행동하기 시작. 언어도 변함." },
-      { title: "약빨 끊김", content: "약빨 떨어져 속수무책. 다시 찐따로 회귀." },
-    ],
-    keyFragments: [
-      "화기운이 강하니까 사주 기운 가지고 드립",
-      "언어사용이 변함 처음엔 나쁜사람 정말 좋지못한행동 이렇게하다가 나중에 바로 욕 갈김",
+      { title: "화기운 보충제", content: "화기운 보충. 남자답게 행동하기 시작. 언어도 변함. '나쁜 사람' → '그 새끼'" },
+      { title: "전기충격", content: "한전사장에게 전기충격. 경찰청장에게서 테이저건 훔쳐옴." },
     ],
     progress: 10,
   },
   {
-    number: 4,
-    title: "전기충격",
-    firstLine: "김형식은 충전한다",
-    synopsis: "한전사장에게 전기충격을 받아 전기에너지를 사용하게 됨.",
-    focusCharacter: "김형식",
+    id: "b5",
+    act: "전개",
+    title: "아군 모으기",
+    description: "장관급 인사들을 포섭. 농림축산부장관(소고기 외교), 국토부장관(토기운), 경찰청장(테이저건). 노양진은 회칼이 무서워서 실패.",
     scenes: [
-      { title: "한전사장 방문", content: "한전사장에게 전기충격" },
-      { title: "전기에너지", content: "전기에너지 사용. 새로운 힘." },
-    ],
-    keyFragments: [
-      "경찰청장에게서 테이저건 훔쳐옴",
+      { title: "소고기 외교", content: "농림축산부장관이 소고기 대접하며 동맹 제안" },
+      { title: "노양진 실패", content: "해양수산부장관 노양진이 회칼 들고 있어서 김형식 개쫄. 포섭 실패." },
+      { title: "경찰특공대", content: "경찰청장 설득. 테이저건 + 경찰특공대 확보." },
     ],
     progress: 5,
   },
   {
-    number: 5,
-    title: "대통령 납치",
-    firstLine: "김형식은 수호한다",
-    synopsis: "기재부장관 문형철이 대통령 납치를 음모한다. 박잭슨과 공모.",
-    focusCharacter: "문형철/박잭슨",
+    id: "b6",
+    act: "위기",
+    title: "약빨 떨어짐",
+    description: "기재부가 소방청 불러서 불기운 차단. 화기운 보충제 효과 소멸. 대통령 납치 음모 발각. 문형철+박잭슨 공모.",
     scenes: [
-      { title: "납치 음모", content: "문형철과 박잭슨이 대통령 납치를 계획" },
-      { title: "김형식 인지", content: "김형식이 음모를 눈치챔" },
-    ],
-    keyFragments: [
-      "기재부장관이 대통령 납치 음모",
+      { title: "소방청 출동", content: "기재부에서 불기운을 막으려고 소방청을 부름. 김형식 힘 약화." },
+      { title: "약빨 소멸", content: "화기운 보충제 효과 떨어져 속수무책. 다시 찐따로 회귀." },
+      { title: "납치 음모", content: "문형철과 박잭슨이 대통령 납치를 계획. 김형식이 눈치챔." },
     ],
     progress: 5,
   },
-  { number: 6, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 7, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 8, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 9, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 10, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 11, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 12, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 13, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 14, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 15, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
-  { number: 16, title: null, firstLine: null, synopsis: null, focusCharacter: null, scenes: [], keyFragments: [], progress: 0 },
+  {
+    id: "b7",
+    act: "절정",
+    title: "반격",
+    description: "김형식이 기재부장관한테 온갖 모욕. 서울구경 시켜줌, 보건복지부장관 통해 스케일링, 추나요법, 내시경. 흙 뿌리기. 비비탄 vs 경찰특공대.",
+    scenes: [
+      { title: "서울구경", content: "기재부장관을 끌고 다니며 서울구경. 굴욕 미러링." },
+      { title: "장관 활용", content: "보건복지부장관: 내시경+스케일링+추나요법. 장관들의 특기를 무기로." },
+      { title: "비비탄 대치", content: "기재부가 특전사에서 비비탄저격수 구해옴. 김형식이 경찰특공대로 대응." },
+      { title: "흙 뿌리기", content: "금속탐지기 통과. 가방에 숨긴 흙을 문형철 얼굴에 뿌림. 복수 완성." },
+    ],
+    progress: 5,
+  },
+  {
+    id: "b8",
+    act: "결말",
+    title: "팬티 찢기",
+    description: "기재부장관 팬티를 찢는다. 갈색이 묻어 있다. 행안부 존속. 김형식 승리.",
+    scenes: [
+      { title: "최후의 일격", content: "김형식이 기재부장관 팬티를 찢는다." },
+      { title: "갈색", content: "찢긴 팬티에 갈색이 묻어 있다. 모두 경악." },
+      { title: "행안부 존속", content: "행안부 폐지 위기 모면. 김형식, 규칙을 지킨 남자의 승리." },
+    ],
+    progress: 5,
+  },
 ];
+
+// ============================================================
+// PLATFORM PLANS (플랫폼별 계획)
+// ============================================================
+export const PLATFORM_PLANS: PlatformPlan[] = [
+  {
+    platform: "영화",
+    totalLength: "90분",
+    pacing: "빠른 호흡. 발단 짧게(15분), 전개 압축(25분), 위기~절정 길게(40분), 결말 임팩트(10분).",
+    beats: ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"],
+    notes: "굴욕 몽타주로 발단 압축. 절정의 장관 활용 시퀀스가 영화의 하이라이트. 마지막 갈색 팬티로 극장 폭소.",
+  },
+  {
+    platform: "웹툰",
+    totalLength: "15~20화",
+    pacing: "회당 하나의 개그 포인트. 비주얼 개그 강조. 각 비트 1~3화.",
+    beats: ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"],
+    notes: "팬티 찢김, 책상 부러짐, 갈색 팬티 등 비주얼 임팩트 장면을 풀페이지로. 장관별 개그 에피소드 가능.",
+  },
+  {
+    platform: "웹소설",
+    totalLength: "40~50화",
+    pacing: "에피소드 추가 가능. 장관들 에피소드 각각 할애. 디테일 살리기.",
+    beats: ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"],
+    notes: "장관별 포섭 에피소드를 5~10화씩 할애. 문서기안 배틀, 사주 드립, 공무원 디테일 최대한 살리기. 독자 댓글 반응 보고 에피소드 추가.",
+  },
+];
+
+// ============================================================
+// EPISODES (하위호환용 — 플롯 비트 기반 10항목)
+// ============================================================
+export const EPISODES: EpisodeData[] = PLOT_BEATS.map((beat, i) => ({
+  number: i + 1,
+  title: beat.title,
+  firstLine: null,
+  synopsis: beat.description,
+  focusCharacter: null,
+  scenes: beat.scenes,
+  keyFragments: [],
+  progress: beat.progress,
+}));
 
 // ============================================================
 // FRAGMENTS (대화에서 나온 모든 파편)
@@ -431,12 +495,16 @@ export function getDailyFragment(): FragmentData {
 }
 
 export function getOverallProgress(): number {
-  const total = EPISODES.reduce((sum, ep) => sum + ep.progress, 0);
-  return Math.round(total / 16);
+  const total = PLOT_BEATS.reduce((sum, b) => sum + b.progress, 0);
+  return Math.round(total / PLOT_BEATS.length);
 }
 
 export function getFilledEpisodes(): number {
-  return EPISODES.filter(ep => ep.title || ep.synopsis || ep.scenes.length > 0).length;
+  return PLOT_BEATS.filter(b => b.progress > 0 || b.scenes.length > 0).length;
+}
+
+export function getPlotBeatsByAct(act: PlotBeat["act"]): PlotBeat[] {
+  return PLOT_BEATS.filter(b => b.act === act);
 }
 
 export function getTotalFragments(): number {

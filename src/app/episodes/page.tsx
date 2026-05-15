@@ -2,79 +2,146 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Film } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Film, Monitor, BookOpen, Clapperboard } from "lucide-react";
 import Link from "next/link";
-import { EPISODES } from "@/lib/data";
+import { PLOT_BEATS, PLATFORM_PLANS, getOverallProgress } from "@/lib/data";
+import type { PlotBeat } from "@/lib/data";
+
+const ACT_COLORS: Record<PlotBeat["act"], { bg: string; text: string; border: string; dot: string }> = {
+  "발단": { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", dot: "bg-amber-400" },
+  "전개": { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", dot: "bg-blue-400" },
+  "위기": { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200", dot: "bg-rose-400" },
+  "절정": { bg: "bg-red-50", text: "text-red-700", border: "border-red-200", dot: "bg-red-500" },
+  "결말": { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", dot: "bg-emerald-500" },
+};
+
+const PLATFORM_ICONS = {
+  "영화": Monitor,
+  "웹툰": Clapperboard,
+  "웹소설": BookOpen,
+};
+
+const PLATFORM_COLORS = {
+  "영화": { bg: "bg-violet-50", border: "border-violet-200", text: "text-violet-700", badge: "bg-violet-100 text-violet-700" },
+  "웹툰": { bg: "bg-rose-50", border: "border-rose-200", text: "text-rose-700", badge: "bg-rose-100 text-rose-700" },
+  "웹소설": { bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", badge: "bg-emerald-100 text-emerald-700" },
+};
 
 export default function EpisodesPage() {
-  const totalProgress = Math.round(
-    EPISODES.reduce((sum, ep) => sum + ep.progress, 0) / 16
-  );
+  const totalProgress = getOverallProgress();
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-4xl mx-auto px-6 py-10">
+      {/* Header */}
       <div className="flex items-center gap-3 mb-2">
         <Film className="w-5 h-5 text-primary" />
-        <h1 className="font-serif text-2xl font-bold">회차</h1>
+        <h1 className="font-serif text-2xl font-bold">플롯 구조</h1>
       </div>
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-10">
         <Progress value={totalProgress} className="h-1.5 flex-1 max-w-xs" />
         <span className="text-sm text-muted-foreground">{totalProgress}%</span>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {EPISODES.map((ep) => (
-          <Link key={ep.number} href={`/episodes/${ep.number}`}>
-            <Card
-              className={`group hover:border-primary/30 transition-all hover:-translate-y-0.5 cursor-pointer h-full ${
-                ep.progress > 0 ? "border-primary/20" : "border-dashed"
-              }`}
-            >
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs text-muted-foreground font-medium">
-                    {ep.number}부
-                  </span>
-                  {ep.focusCharacter && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
-                      {ep.focusCharacter}
-                    </span>
-                  )}
+      {/* ── 5막 타임라인 ── */}
+      <section className="mb-16">
+        <h2 className="text-sm font-medium text-amber-700/80 uppercase tracking-wider mb-6">
+          5막 타임라인
+        </h2>
+        <div className="relative">
+          {/* Timeline line */}
+          <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
+
+          <div className="space-y-4">
+            {PLOT_BEATS.map((beat, i) => {
+              const colors = ACT_COLORS[beat.act];
+              return (
+                <div key={beat.id} className="relative pl-12">
+                  {/* Dot on timeline */}
+                  <div className={`absolute left-2.5 top-5 w-3 h-3 rounded-full ${colors.dot} ring-2 ring-white`} />
+
+                  <Card className={`${colors.bg} ${colors.border} border shadow-sm hover:shadow-md transition-shadow`}>
+                    <CardContent className="p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="secondary" className={`text-[10px] ${colors.bg} ${colors.text} border-0`}>
+                          {beat.act}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">Beat {i + 1}</span>
+                        <div className="ml-auto flex items-center gap-2">
+                          <Progress value={beat.progress} className="h-1 w-16" />
+                          <span className="text-[10px] text-muted-foreground">{beat.progress}%</span>
+                        </div>
+                      </div>
+
+                      <h3 className={`font-medium text-base mb-1.5 ${colors.text}`}>
+                        {beat.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                        {beat.description}
+                      </p>
+
+                      {/* Scenes */}
+                      {beat.scenes.length > 0 && (
+                        <div className="space-y-1.5 mb-3">
+                          {beat.scenes.map((scene, j) => (
+                            <div key={j} className="flex items-start gap-2 text-xs text-gray-500">
+                              <span className="text-muted-foreground/40 mt-0.5 shrink-0">S{j + 1}</span>
+                              <div>
+                                <span className="font-medium text-gray-600">{scene.title}</span>
+                                <span className="text-gray-400 mx-1">--</span>
+                                <span>{scene.content}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <Link
+                        href={`/episodes/${i + 1}`}
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                      >
+                        써보기 &rarr;
+                      </Link>
+                    </CardContent>
+                  </Card>
                 </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-                <h3 className="font-medium text-sm mb-1 min-h-[20px]">
-                  {ep.title || (
-                    <span className="text-muted-foreground/40 italic">
-                      제목 없음
-                    </span>
-                  )}
-                </h3>
-
-                {ep.firstLine && (
-                  <p className="text-xs text-primary/70 italic mb-2">
-                    &ldquo;{ep.firstLine}&rdquo;
+      {/* ── 플랫폼별 계획 ── */}
+      <section>
+        <h2 className="text-sm font-medium text-amber-700/80 uppercase tracking-wider mb-6">
+          플랫폼별 계획
+        </h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          {PLATFORM_PLANS.map((plan) => {
+            const Icon = PLATFORM_ICONS[plan.platform];
+            const colors = PLATFORM_COLORS[plan.platform];
+            return (
+              <Card key={plan.platform} className={`${colors.bg} ${colors.border} border shadow-sm`}>
+                <CardContent className="p-5 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Icon className={`w-4 h-4 ${colors.text}`} />
+                    <h3 className={`font-medium text-sm ${colors.text}`}>{plan.platform}</h3>
+                    <Badge variant="secondary" className={`text-[10px] ml-auto border-0 ${colors.badge}`}>
+                      {plan.totalLength}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    {plan.pacing}
                   </p>
-                )}
-
-                {ep.synopsis ? (
-                  <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed mb-3">
-                    {ep.synopsis}
+                  <p className="text-xs text-gray-500 italic leading-relaxed">
+                    {plan.notes}
                   </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground/30 italic mb-3">
-                    여기 채워질 거야
-                  </p>
-                )}
-
-                <Progress value={ep.progress} className="h-1" />
-                <span className="text-[10px] text-muted-foreground mt-1 block">
-                  {ep.progress}%
-                </span>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
