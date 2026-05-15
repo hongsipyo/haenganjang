@@ -20,17 +20,17 @@ interface ScratchItem {
 const DEMO_SCRATCH: ScratchItem[] = [
   {
     id: "1",
-    content: "핑크색 풍선이라는 걸 키워드로 삼음. 어릴때 핑크색 풍선으로 회피함 힘들면",
+    content: "김형식이 팬티 찢기면서 괴력 발동 — 이때 책상도 같이 부러져야 하나? 아니면 따로?",
     created_at: new Date(Date.now() - 86400000).toISOString(),
   },
   {
     id: "2",
-    content: "달력은 병신들이나 보는 거야.",
+    content: "고소가 안될텐데요? 하하하 — 김광태 대사인데, 이거 매회 반복 개그로 쓸 수 있음",
     created_at: new Date(Date.now() - 172800000).toISOString(),
   },
   {
     id: "3",
-    content: "맨날 과일주스 같은거 많이 먹다가...",
+    content: "대통령 치매 + 기독교 조합: 기도 중에 장관 이름을 성경 인물로 부르는 개그",
     created_at: new Date(Date.now() - 259200000).toISOString(),
   },
 ];
