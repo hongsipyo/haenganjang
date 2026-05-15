@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/client";
 
 // 고정 user_id — 비공개 사이트, 본인만 사용
 const USER_ID = "b18e8cbe-a644-4ef5-b7f0-b2969cbbe8ba";
+// 프로젝트 식별자 — 같은 Supabase에서 데이터 분리
+const PROJECT = "haenganjang";
 
 export interface ActivityLogRow {
   id: string;
@@ -26,7 +28,7 @@ export async function logActivity(
     user_id: USER_ID,
     action,
     detail,
-    section,
+    section: `${PROJECT}:${section}`,
     related_id: relatedId ?? null,
   } as never);
 }
@@ -39,6 +41,7 @@ export async function getActivityLog(days: number = 30) {
   const { data } = (await supabase
     .from("activity_log" as never)
     .select("*")
+    .like("section" as never, `${PROJECT}:%` as never)
     .gte("created_at" as never, since.toISOString() as never)
     .order("created_at" as never, { ascending: false } as never)) as {
     data: ActivityLogRow[] | null;
@@ -85,6 +88,7 @@ export async function saveFragment(
       content,
       tags,
       type,
+      section: PROJECT,
       user_id: USER_ID,
     } as never)
     .select()
@@ -161,6 +165,7 @@ export async function getFragments() {
   const { data } = await supabase
     .from("fragments" as never)
     .select("*")
+    .eq("section" as never, PROJECT as never)
     .order("created_at" as never, { ascending: false } as never);
 
   return (data ?? []) as Record<string, unknown>[];
@@ -174,6 +179,7 @@ export async function saveScratch(content: string) {
     .from("scratch" as never)
     .insert({
       content,
+      moved_to: PROJECT,
       user_id: USER_ID,
     } as never)
     .select()
@@ -191,6 +197,7 @@ export async function getScratchItems() {
   const { data } = await supabase
     .from("scratch" as never)
     .select("*")
+    .eq("moved_to" as never, PROJECT as never)
     .order("created_at" as never, { ascending: false } as never);
 
   return (data ?? []) as Record<string, unknown>[];
@@ -215,7 +222,7 @@ export async function saveBrainstorm(question: string, answer: string, category:
     .insert({
       question,
       answer,
-      category,
+      category: `${PROJECT}:${category}`,
       user_id: USER_ID,
     } as never)
     .select()
@@ -239,8 +246,9 @@ export async function getBrainstormHistory() {
   const { data } = (await supabase
     .from("brainstorm_history" as never)
     .select("*")
+    .like("category" as never, `${PROJECT}:%` as never)
     .order("created_at" as never, { ascending: false } as never)
-    .limit(50)) as { data: { id: string; question: string; answer: string; created_at: string }[] | null };
+    .limit(50)) as { data: { id: string; question: string; answer: string; category: string; created_at: string }[] | null };
 
   return data ?? [];
 }
@@ -272,6 +280,7 @@ export async function saveScene(scene: {
     .insert({
       ...scene,
       characters: scene.characters ?? [],
+      prompt_id: scene.prompt_id ?? PROJECT,
       user_id: USER_ID,
     } as never)
     .select()
@@ -304,6 +313,7 @@ export async function getScenes() {
   const { data } = await supabase
     .from("written_scenes" as never)
     .select("*")
+    .eq("prompt_id" as never, PROJECT as never)
     .order("episode_number" as never, { ascending: true } as never)
     .order("scene_order" as never, { ascending: true } as never);
   return (data ?? []) as WrittenScene[];
