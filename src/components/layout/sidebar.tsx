@@ -17,6 +17,8 @@ import {
   Menu,
   X,
   Pen,
+  Feather,
+  BookText,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -31,6 +33,8 @@ const navItems = [
   { href: "/progress", label: "프로그레스", icon: TrendingUp, emoji: "" },
   { href: "/refs", label: "레퍼런스", icon: BookOpen, emoji: "" },
   { href: "/scratch", label: "메모", icon: StickyNote, emoji: "" },
+  { href: "/zen", label: "Zen", icon: Feather, emoji: "" },
+  { href: "/manuscript", label: "전체 원고", icon: BookText, emoji: "" },
 ];
 
 const ENCOURAGEMENTS = [
