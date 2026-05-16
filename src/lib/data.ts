@@ -48,7 +48,7 @@ export interface RefData {
 // LOGLINE
 // ============================================================
 export const LOGLINE =
-  "규칙을 지키며 살아온 32년차 관료 행안부장관 김형식이, 기재부장관에게 국무회의에서 팬티를 찢기는 수모를 당하고, 행안부를 지키기 위해 봉인된 힘을 깨우는 정치풍자 코미디.";
+  "규칙을 지키며 살아온 32년차 관료 행안부장관 김형식이, 기재부장관에게 국무회의에서 팬티를 찢기는 수모를 당하고, 무능한 차관 문형철밖에 없는 행안부를 지키기 위해 봉인된 힘을 깨우는 정치풍자 코미디.";
 
 // ============================================================
 // CHARACTERS
@@ -72,7 +72,8 @@ export const CHARACTERS: CharacterData[] = [
       당뇨: "당뇨 있음",
     },
     relationships: [
-      "문형철 — 과동기, 적대 관계, 푸코를 안 들었음",
+      "기재부장관 — 과동기, 적대 관계, 푸코를 안 들었음",
+      "문형철 — 행안부 차관, 무능한 부하",
       "아내 — 성욕 없다고 괜찮다 했는데 화기 접신 후 여자가 되어버림",
       "노양진 — 회칼 들고 다녀서 개쫄",
       "대통령 — 충성하지만 치매라 소통 안 됨",
@@ -86,8 +87,25 @@ export const CHARACTERS: CharacterData[] = [
   },
   {
     id: "hyungchul",
-    name: "문형철 (기재부장관)",
-    description: "기업인 출신 엘리트, 간신배 거느림, 작은 일 키우는 스타일",
+    name: "문형철 (행안부 차관)",
+    description: "행안부 차관, 김형식 밑의 무능한 deputy. 도움이 안 됨.",
+    element: null,
+    animal: null,
+    details: {
+      직위: "행정안전부 차관 (김형식의 부하)",
+      성격: "무능, 일 못함, 존재감 없음",
+      문제: "도움을 요청하면 더 꼬이게 만듦",
+    },
+    relationships: [
+      "김형식 — 상관. 부하인데 도움이 안 됨",
+    ],
+    notes: "행안부 차관인데 무능해서 김형식이 답답해함. 도움이 안 되는 이유는 배신이 아니라 순수한 무능.",
+    keyLines: [],
+  },
+  {
+    id: "gijaebu",
+    name: "기재부장관 (이름 미정)",
+    description: "기업인 출신 엘리트, 간신배 거느림, 작은 일 키우는 스타일. 메인 악역.",
     element: null,
     animal: null,
     details: {
@@ -112,16 +130,16 @@ export const CHARACTERS: CharacterData[] = [
   {
     id: "jackson",
     name: "박잭슨 (외교부장관)",
-    description: "외세 끌어오는 역할, 문형철과 공모",
+    description: "외세 끌어오는 역할, 기재부장관과 공모",
     element: null,
     animal: null,
     details: {
       역할: "외세 끌어오는 역할",
-      공모: "문형철과 함께 대통령 납치 음모",
+      공모: "기재부장관과 함께 대통령 납치 음모",
       번역: "영어 번역이 TV로 나가는데 알카에다가 한 거 같음",
     },
     relationships: [
-      "문형철 — 공모 관계",
+      "기재부장관 — 공모 관계",
     ],
     notes: "영어번역 tv로 나가는거 알카에다가 한거같아",
     keyLines: [],
@@ -155,7 +173,7 @@ export const CHARACTERS: CharacterData[] = [
       약점: "감언이설에 넘어감",
     },
     relationships: [
-      "문형철 — 기재부장관에게 조종당함",
+      "기재부장관 — 기재부장관에게 조종당함",
       "김형식 — 기독교인인 척 교회 다님",
     ],
     notes: "김형식이 대통령이 기독교인이라 기독교인인척 함 교회 다님. '이런 바리새인 같은 새끼.'",
@@ -269,11 +287,11 @@ export const PLOT_BEATS: PlotBeat[] = [
     id: "b1",
     act: "발단",
     title: "팬티 찢김",
-    description: "국무회의에서 기재부장관 문형철에게 팬티를 찢기는 수모. 여자 장관들, 직원들 앞에서. 협상했지만 얼굴에 흙뿌림.",
+    description: "국무회의에서 기재부장관에게 팬티를 찢기는 수모. 여자 장관들, 직원들 앞에서. 협상했지만 얼굴에 흙뿌림.",
     scenes: [
-      { title: "국무회의 시작", content: "평범한 국무회의. 예산안 심의. 김형식 발언 중 문형철이 끼어듦" },
+      { title: "국무회의 시작", content: "평범한 국무회의. 예산안 심의. 김형식 발언 중 기재부장관이 끼어듦" },
       { title: "팬티 찢김", content: "여자 장관들, 직원들 보는 앞에서 팬티가 찢긴다. 인명피해 없음. 수치심만." },
-      { title: "협상 실패", content: "팬티 찢지 말라고 협상. 문형철이 얼굴에 흙을 뿌림. 김형식 무력함." },
+      { title: "협상 실패", content: "팬티 찢지 말라고 협상. 기재부장관이 얼굴에 흙을 뿌림. 김형식 무력함." },
     ],
     progress: 15,
   },
@@ -281,9 +299,9 @@ export const PLOT_BEATS: PlotBeat[] = [
     id: "b2",
     act: "발단",
     title: "반복되는 굴욕",
-    description: "마이크 끄기, 제로콜라 라벨에 설탕콜라(당뇨 쇼크), 골프 모임 소외. 작은 일을 키우는 문형철의 패턴.",
+    description: "마이크 끄기, 제로콜라 라벨에 설탕콜라(당뇨 쇼크), 골프 모임 소외. 작은 일을 키우는 기재부장관의 패턴.",
     scenes: [
-      { title: "마이크 끄기", content: "국무회의에서 김형식 발언 중 마이크가 꺼진다. 문형철 측근의 소행." },
+      { title: "마이크 끄기", content: "국무회의에서 김형식 발언 중 마이크가 꺼진다. 기재부장관 측근의 소행." },
       { title: "설탕콜라", content: "제로콜라 라벨에 설탕콜라. 당뇨인 김형식 쇼크." },
       { title: "골프 소외", content: "장관들 골프 모임에서 김형식만 빠짐. 혼자 청사에 남는 오후." },
     ],
@@ -295,7 +313,7 @@ export const PLOT_BEATS: PlotBeat[] = [
     title: "책상 부러짐",
     description: "분노한 김형식이 책상을 치는데 책상이 부러진다. 봉인된 힘이 새어나온 첫 순간. 의식을 잃는다.",
     scenes: [
-      { title: "기재부의 도발", content: "문형철이 사소한 행정 문제를 국가 위기로 확대" },
+      { title: "기재부의 도발", content: "기재부장관이 사소한 행정 문제를 국가 위기로 확대" },
       { title: "책상 부러짐", content: "김형식이 책상을 치는데 책상이 부러진다. 주변 사람들 경악." },
       { title: "의식 상실", content: "봉인된 힘이 새어나옴. 김형식 쓰러짐." },
     ],
@@ -329,11 +347,11 @@ export const PLOT_BEATS: PlotBeat[] = [
     id: "b6",
     act: "위기",
     title: "약빨 떨어짐",
-    description: "기재부가 소방청 불러서 불기운 차단. 화기운 보충제 효과 소멸. 대통령 납치 음모 발각. 문형철+박잭슨 공모.",
+    description: "기재부가 소방청 불러서 불기운 차단. 화기운 보충제 효과 소멸. 대통령 납치 음모 발각. 기재부장관+박잭슨 공모.",
     scenes: [
       { title: "소방청 출동", content: "기재부에서 불기운을 막으려고 소방청을 부름. 김형식 힘 약화." },
       { title: "약빨 소멸", content: "화기운 보충제 효과 떨어져 속수무책. 다시 찐따로 회귀." },
-      { title: "납치 음모", content: "문형철과 박잭슨이 대통령 납치를 계획. 김형식이 눈치챔." },
+      { title: "납치 음모", content: "기재부장관과 박잭슨이 대통령 납치를 계획. 김형식이 눈치챔." },
     ],
     progress: 5,
   },
@@ -341,12 +359,12 @@ export const PLOT_BEATS: PlotBeat[] = [
     id: "b7",
     act: "절정",
     title: "반격",
-    description: "김형식이 기재부장관한테 온갖 모욕. 서울구경 시켜줌, 보건복지부장관 통해 스케일링, 추나요법, 내시경. 흙 뿌리기. 비비탄 vs 경찰특공대.",
+    description: "김형식이 기재부장관한테 온갖 모욕 미러링. 서울구경 시켜줌, 보건복지부장관 통해 스케일링, 추나요법, 내시경. 흙 뿌리기. 비비탄 vs 경찰특공대.",
     scenes: [
-      { title: "서울구경", content: "기재부장관을 끌고 다니며 서울구경. 굴욕 미러링." },
+      { title: "서울구경", content: "기재부장관을 끌고 다니며 서울구경 시키기. 굴욕 미러링." },
       { title: "장관 활용", content: "보건복지부장관: 내시경+스케일링+추나요법. 장관들의 특기를 무기로." },
       { title: "비비탄 대치", content: "기재부가 특전사에서 비비탄저격수 구해옴. 김형식이 경찰특공대로 대응." },
-      { title: "흙 뿌리기", content: "금속탐지기 통과. 가방에 숨긴 흙을 문형철 얼굴에 뿌림. 복수 완성." },
+      { title: "흙 뿌리기", content: "금속탐지기 통과. 가방에 숨긴 흙을 기재부장관 얼굴에 뿌림. 복수 완성." },
     ],
     progress: 5,
   },
@@ -415,7 +433,7 @@ export const FRAGMENTS: FragmentData[] = [
   { id: "f3", content: "예산심의하러 기재부를 가서 신체검사를 받다가 고추를 만짐당함", tags: ["장면", "기재부", "수치"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
   { id: "f4", content: "골프 등의 공무원스러운 요소 초반에 활용. 주인공은 골프 안쳐서 소외됨", tags: ["설정", "골프", "소외"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
   { id: "f5", content: "화기운이 강하니까 사주 기운 가지고 드립", tags: ["오행", "사주", "유머"], type: "text", createdAt: "2026-05-14" },
-  { id: "f6", content: "기재부장관 화장실 갈때 직원 3명이 종류별로 휴지 대기함", tags: ["캐릭터", "문형철", "유머"], character: "hyungchul", type: "text", createdAt: "2026-05-14" },
+  { id: "f6", content: "기재부장관 화장실 갈때 직원 3명이 종류별로 휴지 대기함", tags: ["캐릭터", "기재부장관", "유머"], character: "gijaebu", type: "text", createdAt: "2026-05-14" },
   { id: "f7", content: "언어사용이 변함 처음엔 나쁜사람 정말 좋지못한행동 이렇게하다가 나중에 바로 욕 갈김", tags: ["캐릭터", "김형식", "변화"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
   { id: "f8", content: "청사에 금속탐지기 검사 때 긴장 하지만 안걸림. 흙을 숨겨왓음", tags: ["장면", "긴장"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
   { id: "f9", content: "대통령이 기독교인이라 기독교인인척 함 교회 다님. 이런 바리새인 같은 새끼", tags: ["대통령", "종교", "유머"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
@@ -426,11 +444,11 @@ export const FRAGMENTS: FragmentData[] = [
   { id: "f14", content: "마이크끄기 장난도 당함", tags: ["장면", "괴롭힘"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
   { id: "f15", content: "중간에 당뇨인주인공에게 제로콜라라벨에 그냥 좆 설탕콜라 넣어서 쇼크오게함", tags: ["장면", "당뇨", "음모"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
   { id: "f16", content: "기재부장관이 특전사에서 비비탄저격수 구해와가지고 당해서 경찰특공대로 대응함", tags: ["장면", "액션", "대립"], type: "text", createdAt: "2026-05-14" },
-  { id: "f17", content: "우정사업본부장을 매수해서 택배가 안옴", tags: ["장면", "음모", "유머"], character: "hyungchul", type: "text", createdAt: "2026-05-14" },
+  { id: "f17", content: "우정사업본부장을 매수해서 택배가 안옴", tags: ["장면", "음모", "유머"], character: "gijaebu", type: "text", createdAt: "2026-05-14" },
   { id: "f18", content: "장관님과의 식사 vs 5000만원", tags: ["아이디어", "유머"], type: "text", createdAt: "2026-05-14" },
   { id: "f19", content: "화기운을 만땅 하기위해 불을 끄고 제갈량처럼 사흘간 기도함 근데 어떤새끼가 들어와서 욕함", tags: ["장면", "화기운", "유머"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
-  { id: "f20", content: "기재부에서 불기운을 막으려고 소방청을 부름", tags: ["장면", "오행", "대립"], character: "hyungchul", type: "text", createdAt: "2026-05-14" },
-  { id: "f21", content: "기재부장관과 행안부장관은 과동기 근데 푸코를 안들음", tags: ["설정", "관계"], type: "text", createdAt: "2026-05-14" },
+  { id: "f20", content: "기재부에서 불기운을 막으려고 소방청을 부름", tags: ["장면", "오행", "대립"], character: "gijaebu", type: "text", createdAt: "2026-05-14" },
+  { id: "f21", content: "기재부장관과 행안부장관은 과동기 근데 기재부장관이 푸코를 안들음", tags: ["설정", "관계"], type: "text", createdAt: "2026-05-14" },
   { id: "f22", content: "군인은 왜 근로자가 아니야 근로 했잖아 씨발 이라고 행패를 부리는데 행안부장관이 주먹으로 제압", tags: ["장면", "액션", "유머"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
   { id: "f23", content: "지갑 동원령 팬티 계엄령 회식 독박씀", tags: ["대사", "유머"], type: "text", createdAt: "2026-05-14" },
   { id: "f24", content: "언포기븐 무시마 내가걸어온 커리어", tags: ["대사", "김형식", "각성"], character: "hyungsik", type: "text", createdAt: "2026-05-14" },
@@ -460,7 +478,7 @@ export const REFS: RefData[] = [
 // ============================================================
 export const DAILY_MISSIONS = [
   "Ch1 국무회의에서 팬티 찢기는 순간, 김형식의 내면 독백을 3문장으로 써봐.",
-  "문형철이 화장실 갈 때 직원 3명이 휴지 대기하는 장면을 구체적으로 써봐.",
+  "기재부장관이 화장실 갈 때 직원 3명이 휴지 대기하는 장면을 구체적으로 써봐.",
   "김형식이 골프 모임에서 소외당하는 장면을 5문장으로 써봐.",
   "화기운 보충제를 처음 먹고 언어가 변하는 그 순간을 써봐. '나쁜 사람'에서 욕으로.",
   "노양진 해양수산부장관이 회칼로 방어 잡는 장면. 김형식이 쫄아서 뒷걸음치는 것까지.",
@@ -593,13 +611,20 @@ const CHARACTER_SPECIFIC_QUESTIONS: Record<string, Omit<CharacterQuestion, "id">
     { category: "memory", question: "어렸을 때 힘이 봉인된 그 날을 기억해?" },
     { category: "memory", question: "공무원 시험 합격한 날 뭘 했어?" },
     { category: "relationship", question: "아내한테 가장 미안한 건 뭐야?" },
-    { category: "relationship", question: "문형철이 과동기라는 게 왜 더 분해?" },
+    { category: "relationship", question: "기재부장관이 과동기라는 게 왜 더 분해?" },
     { category: "scene", question: "화기운이 처음 깨어나는 그 순간을 써봐." },
     { category: "scene", question: "'성실하게 노동하듯이 섹스'하는 장면의 톤을 잡아봐." },
     { category: "secret", question: "산불이 너 때문이라는 거 알아?" },
     { category: "secret", question: "기억의 흐름이 끊긴 부분에 뭐가 있어?" },
   ],
   hyungchul: [
+    { category: "inner", question: "무능한 건 자각하고 있어? 아니면 자기는 잘하고 있다고 생각해?" },
+    { category: "inner", question: "김형식 밑에서 차관하는 거 자존심 상해?" },
+    { category: "scene", question: "김형식이 일 시켰는데 완전히 망쳐서 보고하는 장면을 써봐." },
+    { category: "scene", question: "문형철이 기적적으로 도움이 되는 딱 한 순간을 써봐." },
+    { category: "secret", question: "사실 김형식을 존경하는 거야?" },
+  ],
+  gijaebu: [
     { category: "inner", question: "작은 일을 키우는 건 전략이야 성격이야?" },
     { category: "inner", question: "사주를 몰래 보는 이유는?" },
     { category: "inner", question: "룸빵 안 가는 건 도덕이야 이미지 관리야?" },
@@ -649,10 +674,16 @@ export interface RelationshipLink {
 
 export const RELATIONSHIPS: RelationshipLink[] = [
   {
-    from: "hyungsik", to: "hyungchul",
+    from: "hyungsik", to: "gijaebu",
     label: "과동기 → 적대",
     tension: "conflict",
-    scenePrompt: "국무회의에서 문형철이 김형식을 도발하는 장면을 써봐. 과동기라는 사실이 드러나는 순간.",
+    scenePrompt: "국무회의에서 기재부장관이 김형식을 도발하는 장면을 써봐. 과동기라는 사실이 드러나는 순간.",
+  },
+  {
+    from: "hyungsik", to: "hyungchul",
+    label: "상관 → 무능한 부하",
+    tension: "conflict",
+    scenePrompt: "김형식이 문형철 차관에게 일을 시켰는데 완전히 망쳐서 돌아오는 장면.",
   },
   {
     from: "hyungsik", to: "wife",
@@ -679,16 +710,16 @@ export const RELATIONSHIPS: RelationshipLink[] = [
     scenePrompt: "김형식이 법적 대응을 요청하는데 김광태가 웃으며 거절하는 장면.",
   },
   {
-    from: "hyungchul", to: "jackson",
+    from: "gijaebu", to: "jackson",
     label: "공모",
     tension: "friend",
-    scenePrompt: "문형철과 박잭슨이 대통령 납치를 모의하는 밀실 장면을 써봐.",
+    scenePrompt: "기재부장관과 박잭슨이 대통령 납치를 모의하는 밀실 장면을 써봐.",
   },
   {
-    from: "hyungchul", to: "president",
+    from: "gijaebu", to: "president",
     label: "조종",
     tension: "conflict",
-    scenePrompt: "문형철이 감언이설로 대통령을 넘기는 장면. 대통령은 미소, 김형식은 분노.",
+    scenePrompt: "기재부장관이 감언이설로 대통령을 넘기는 장면. 대통령은 미소, 김형식은 분노.",
   },
   {
     from: "hyungsik", to: "kukto",
@@ -723,14 +754,14 @@ export interface ScenePrompt {
 
 export const SCENE_PROMPTS: ScenePrompt[] = [
   {
-    id: "sp1", title: "팬티 찢김 — 국무회의", characters: ["hyungsik", "hyungchul"],
+    id: "sp1", title: "팬티 찢김 — 국무회의", characters: ["hyungsik", "gijaebu"],
     episode: 1, difficulty: "hard", written: false,
-    prompt: "국무회의 중 문형철이 김형식의 팬티를 찢는다. 여자 장관들, 직원들 보는 앞에서. 수치심, 분노, 무력함. 그 3초를 써봐.",
+    prompt: "국무회의 중 기재부장관이 김형식의 팬티를 찢는다. 여자 장관들, 직원들 보는 앞에서. 수치심, 분노, 무력함. 그 3초를 써봐.",
   },
   {
-    id: "sp2", title: "흙 뿌림 — 협상 실패", characters: ["hyungsik", "hyungchul"],
+    id: "sp2", title: "흙 뿌림 — 협상 실패", characters: ["hyungsik", "gijaebu"],
     episode: 1, difficulty: "medium", written: false,
-    prompt: "팬티 찢지 말라고 협상하는 김형식. 문형철이 얼굴에 흙을 뿌린다. 주변 반응, 김형식 내면.",
+    prompt: "팬티 찢지 말라고 협상하는 김형식. 기재부장관이 얼굴에 흙을 뿌린다. 주변 반응, 김형식 내면.",
   },
   {
     id: "sp3", title: "책상 부러짐", characters: ["hyungsik"],
@@ -753,12 +784,12 @@ export const SCENE_PROMPTS: ScenePrompt[] = [
     prompt: "화기운을 만땅 하기 위해 불을 끄고 제갈량처럼 사흘간 기도. 셋째 날, 누군가 문을 열고 들어와서 욕한다.",
   },
   {
-    id: "sp7", title: "문서기안 배틀", characters: ["hyungsik", "hyungchul"],
+    id: "sp7", title: "문서기안 배틀", characters: ["hyungsik", "gijaebu"],
     episode: undefined, difficulty: "hard", written: false,
     prompt: "문서기안으로 싸우는 공무원식 배틀. 결재선, 회신 기한, 참조 넣고 빼기. 대사와 함께.",
   },
   {
-    id: "sp8", title: "비비탄 vs 경찰특공대", characters: ["hyungsik", "hyungchul"],
+    id: "sp8", title: "비비탄 vs 경찰특공대", characters: ["hyungsik", "gijaebu"],
     episode: undefined, difficulty: "hard", written: false,
     prompt: "기재부장관이 특전사에서 비비탄저격수를 구해온다. 김형식이 경찰특공대로 대응한다. 이 대치를 써봐.",
   },
@@ -778,8 +809,8 @@ export const SCENE_PROMPTS: ScenePrompt[] = [
     prompt: "장관들이 골프 라운딩 약속을 잡는다. 김형식만 빠진다. 혼자 청사에 남아있는 오후.",
   },
   {
-    id: "sp12", title: "대통령 납치 음모", characters: ["hyungchul", "jackson"],
+    id: "sp12", title: "대통령 납치 음모", characters: ["gijaebu", "jackson"],
     episode: 5, difficulty: "hard", written: false,
-    prompt: "문형철과 박잭슨이 대통령 납치를 계획한다. 밀실. 구체적 계획. 긴장감과 코미디 사이.",
+    prompt: "기재부장관과 박잭슨이 대통령 납치를 계획한다. 밀실. 구체적 계획. 긴장감과 코미디 사이.",
   },
 ];
