@@ -776,20 +776,77 @@ export default function CharacterDetailPage() {
 
           {/* 떡밥 자동 수집 */}
           {(() => {
-            const lines = notes.split("\n").filter((line) =>
-              /떡밥|복선|미회수|발전.*가능|열린.*결말|떠넘|나중에|이후에|아직|비밀|숨기|감추|단서/.test(line)
-            );
-            if (lines.length === 0) return null;
+            if (!notes.trim()) return null;
+
+            const CATEGORIES: { label: string; color: string; patterns: RegExp[] }[] = [
+              { label: "미회수 떡밥", color: "red", patterns: [/미회수/, /떡밥/, /복선/, /떠넘/] },
+              { label: "비밀/숨김", color: "purple", patterns: [/비밀/, /숨기/, /감추/, /몰래/, /들키/] },
+              { label: "발전 가능", color: "amber", patterns: [/발전/, /가능/, /열린/, /나중에/, /이후에/, /언젠가/] },
+              { label: "미해결", color: "blue", patterns: [/아직/, /안.*됐/, /모르/, /의문/, /단서/, /왜\??/] },
+            ];
+
+            const COLORS: Record<string, { bg: string; border: string; text: string; badge: string }> = {
+              red: { bg: "bg-red-50", border: "border-red-200", text: "text-red-700", badge: "bg-red-100 text-red-600" },
+              purple: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700", badge: "bg-purple-100 text-purple-600" },
+              amber: { bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-700", badge: "bg-amber-100 text-amber-600" },
+              blue: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700", badge: "bg-blue-100 text-blue-600" },
+            };
+
+            // 문장 단위로 분리 (줄바꿈, 마침표, - 글머리 기준)
+            const sentences = notes
+              .split(/\n|(?<=\.)\s|(?<=다\.)|(?<=요\.)|(?<=음\.)|(?<=됨\.)/)
+              .map((s) => s.replace(/^[-·•*]\s*/, "").trim())
+              .filter((s) => s.length > 2);
+
+            const results: { sentence: string; category: string; color: string }[] = [];
+            const seen = new Set<string>();
+
+            for (const s of sentences) {
+              for (const cat of CATEGORIES) {
+                if (cat.patterns.some((p) => p.test(s))) {
+                  const key = s.slice(0, 30);
+                  if (!seen.has(key)) {
+                    seen.add(key);
+                    // 키워드 마커 제거해서 핵심만 추출
+                    const cleaned = s
+                      .replace(/^(떡밥|복선|비밀|단서|미회수)\s*[:：\-]\s*/i, "")
+                      .replace(/^\[.*?\]\s*/, "")
+                      .trim();
+                    results.push({ sentence: cleaned || s, category: cat.label, color: cat.color });
+                  }
+                  break;
+                }
+              }
+            }
+
+            if (results.length === 0) return null;
+
+            // 카테고리별 그룹화
+            const grouped = new Map<string, typeof results>();
+            for (const r of results) {
+              if (!grouped.has(r.category)) grouped.set(r.category, []);
+              grouped.get(r.category)!.push(r);
+            }
+
             return (
               <div className="mt-4 border-t border-pink-100 pt-4">
-                <p className="text-xs text-pink-500 font-medium mb-2">떡밥 / 발전 가능 요소 ({lines.length}개)</p>
-                <div className="space-y-1.5">
-                  {lines.map((line, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm bg-pink-50 rounded p-2 border border-pink-100">
-                      <span className="text-pink-400 shrink-0">*</span>
-                      <span className="text-pink-700">{line.trim()}</span>
-                    </div>
-                  ))}
+                <p className="text-xs text-pink-500 font-medium mb-3">떡밥 / 발전 가능 요소 ({results.length}개 추출)</p>
+                <div className="space-y-3">
+                  {Array.from(grouped.entries()).map(([cat, items]) => {
+                    const c = COLORS[items[0].color];
+                    return (
+                      <div key={cat}>
+                        <span className={`inline-block text-xs px-2 py-0.5 rounded-full mb-1.5 ${c.badge}`}>{cat}</span>
+                        <div className="space-y-1">
+                          {items.map((item, i) => (
+                            <div key={i} className={`text-sm rounded p-2 ${c.bg} ${c.border} border`}>
+                              <span className={c.text}>{item.sentence}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
