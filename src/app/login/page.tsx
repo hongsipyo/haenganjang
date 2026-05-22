@@ -1,67 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useState } from "react";
+import { login, signup } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"login" | "signup">("login");
 
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.signOut().catch(() => {});
-  }, []);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(formData: FormData) {
     setError("");
     setInfo("");
     setLoading(true);
 
     try {
-      const supabase = createClient();
+      const result = mode === "login" ? await login(formData) : await signup(formData);
 
-      if (mode === "signup") {
-        const { error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-
-        if (signUpError) {
-          setError(signUpError.message);
-          setLoading(false);
-          return;
-        }
-
-        setInfo("가입 완료! 이메일 확인 후 로그인하세요. (메일함 확인)");
+      if (result?.error) {
+        setError(result.error);
+      } else if (result?.success) {
+        setInfo(result.success);
         setMode("login");
-        setLoading(false);
-        return;
       }
-
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) {
-        setError(signInError.message);
-        setLoading(false);
-        return;
-      }
-
-      window.location.href = "/home";
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다");
-      setLoading(false);
+    } catch {
+      // redirect from server action throws - this is expected on success
     }
+
+    setLoading(false);
   }
 
   return (
@@ -73,20 +42,18 @@ export default function LoginPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form action={handleSubmit} className="space-y-4">
             <Input
+              name="email"
               type="email"
               placeholder="이메일"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
               autoFocus
             />
             <Input
+              name="password"
               type="password"
               placeholder="비밀번호 (6자 이상)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
             />

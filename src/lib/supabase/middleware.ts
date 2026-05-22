@@ -25,11 +25,14 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user ?? null;
+  } catch {
+    user = null;
+  }
 
-  // Redirect to login if not authenticated (except login page and api routes)
   if (
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
