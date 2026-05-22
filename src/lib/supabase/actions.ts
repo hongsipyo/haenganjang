@@ -1,9 +1,14 @@
 import { createClient } from "@/lib/supabase/client";
 
-// 고정 user_id — 비공개 사이트, 본인만 사용
-const USER_ID = "b18e8cbe-a644-4ef5-b7f0-b2969cbbe8ba";
 // 프로젝트 식별자 — 같은 Supabase에서 데이터 분리
 const PROJECT = "haenganjang";
+
+async function getUserId(): Promise<string> {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) throw new Error("로그인이 필요합니다");
+  return session.user.id;
+}
 
 export interface ActivityLogRow {
   id: string;
@@ -25,7 +30,7 @@ export async function logActivity(
 ) {
   const supabase = createClient();
   await supabase.from("activity_log" as never).insert({
-    user_id: USER_ID,
+    user_id: await getUserId(),
     action,
     detail,
     section: `${PROJECT}:${section}`,
@@ -89,7 +94,7 @@ export async function saveFragment(
       tags,
       type,
       section: PROJECT,
-      user_id: USER_ID,
+      user_id: await getUserId(),
     } as never)
     .select()
     .single()) as { data: { id: string } | null; error: unknown };
@@ -153,7 +158,7 @@ export async function saveCharacterField(
       .insert({
         name: charName,
         [field]: value,
-        user_id: USER_ID,
+        user_id: await getUserId(),
       } as never);
   }
 
@@ -180,7 +185,7 @@ export async function saveScratch(content: string) {
     .insert({
       content,
       moved_to: PROJECT,
-      user_id: USER_ID,
+      user_id: await getUserId(),
     } as never)
     .select()
     .single()) as { data: { id: string } | null; error: unknown };
@@ -223,7 +228,7 @@ export async function saveBrainstorm(question: string, answer: string, category:
       question,
       answer,
       category: `${PROJECT}:${category}`,
-      user_id: USER_ID,
+      user_id: await getUserId(),
     } as never)
     .select()
     .single();
@@ -281,7 +286,7 @@ export async function saveScene(scene: {
       ...scene,
       characters: scene.characters ?? [],
       prompt_id: scene.prompt_id ?? PROJECT,
-      user_id: USER_ID,
+      user_id: await getUserId(),
     } as never)
     .select()
     .single();
