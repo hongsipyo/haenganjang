@@ -37,11 +37,11 @@ import {
 } from "@/lib/supabase/actions";
 
 const ENCOURAGEMENTS = [
-  "오늘도 한 줄이면 충분해",
-  "쓰는 것만으로 이미 대단해",
-  "천천히, 네 속도로",
-  "다정아, 오늘도 와줬구나",
-  "한 문장이 한 세계를 만들어",
+  "기재부장관 팬티 찢기기 전에 한 줄 써",
+  "김형식 32년차 관료의 눈물을 써줘",
+  "봉인된 힘이 깨어나려면 네 펜이 필요해",
+  "풍자는 현실보다 정확해야 한다",
+  "오늘 안 쓰면 기재부가 이긴다",
 ];
 
 interface DbStats {
@@ -146,10 +146,10 @@ export default function HomePage() {
               {/* Title */}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                 <span className="font-serif text-5xl font-bold tracking-tight bg-gradient-to-b from-rose-400 to-amber-500 bg-clip-text text-transparent">
-                  다정
+                  행안부장관
                 </span>
                 <span className="text-[9px] tracking-[0.3em] text-rose-400/70 uppercase">
-                  a novel &middot; screenplay
+                  political satire &middot; comedy
                 </span>
                 <span className="text-[10px] tracking-[0.2em] text-amber-600/70 mt-4 font-medium">
                   홍시표
@@ -163,10 +163,10 @@ export default function HomePage() {
         </div>
         <div className="space-y-2">
           <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-rose-900">
-            다정
+            행안부장관
           </h1>
           <p className="text-amber-800/70 text-lg md:text-xl max-w-md mx-auto leading-relaxed">
-            내 젊음을 농축한 16부작 드라마 &middot; 소설
+            정치풍자 코미디
           </p>
           {mounted && (
             <p className="text-sm text-rose-400/80 flex items-center justify-center gap-1.5 pt-1">
@@ -428,7 +428,7 @@ export default function HomePage() {
           작가 홍시표의 작업 공간
         </p>
         <p className="text-[11px] text-amber-300/80">
-          매일 조금씩, 다정하게
+          매일 조금씩, 한 줄씩
         </p>
       </footer>
     </div>
