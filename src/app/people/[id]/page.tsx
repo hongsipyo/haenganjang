@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Edit2, Save, ChevronDown, ChevronUp, Pen, BookOpen } from "lucide-react";
+import { ArrowLeft, Edit2, Save, ChevronDown, ChevronUp, Pen, BookOpen, Plus, Check, X } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
@@ -16,7 +16,7 @@ import {
   CHARACTER_Q_CATEGORIES,
   SCENE_PROMPTS,
 } from "@/lib/data";
-import { saveBrainstorm, getBrainstormHistory, saveCharacterField, getCharacterOverrides } from "@/lib/supabase/actions";
+import { saveBrainstorm, getBrainstormHistory, saveCharacterField, getCharacterOverrides, saveScratch, getScratchItems } from "@/lib/supabase/actions";
 import { Input } from "@/components/ui/input";
 
 // Tension color mapping
@@ -123,6 +123,22 @@ export default function CharacterDetailPage() {
   const [sceneText, setSceneText] = useState<Record<string, string>>({});
   const [savingScene, setSavingScene] = useState<string | null>(null);
 
+  // Editable relationships
+  type TensionType = "love" | "family" | "friend" | "conflict" | "mentor" | "loss";
+  interface RelOverride { label?: string; tension?: TensionType; scenePrompt?: string }
+  const [relOverrides, setRelOverrides] = useState<Record<string, RelOverride>>({});
+  const [editingRelLabel, setEditingRelLabel] = useState<string | null>(null);
+  const [editingRelPrompt, setEditingRelPrompt] = useState<string | null>(null);
+  const [tempRelLabel, setTempRelLabel] = useState("");
+  const [tempRelPrompt, setTempRelPrompt] = useState("");
+  const [savingRelEdit, setSavingRelEdit] = useState<string | null>(null);
+  const [customRels, setCustomRels] = useState<{ from: string; to: string; label: string; tension: TensionType; scenePrompt: string }[]>([]);
+  const [addingRel, setAddingRel] = useState(false);
+  const [newRelTo, setNewRelTo] = useState("");
+  const [newRelLabel, setNewRelLabel] = useState("");
+  const [newRelTension, setNewRelTension] = useState<TensionType>("friend");
+  const [newRelPrompt, setNewRelPrompt] = useState("");
+
   // Load brainstorm history
   const loadHistory = useCallback(async () => {
     try {
@@ -142,6 +158,38 @@ export default function CharacterDetailPage() {
   useEffect(() => {
     loadHistory();
   }, [loadHistory]);
+
+  // Load relationship overrides from scratch
+  useEffect(() => {
+    if (!charId) return;
+    getScratchItems().then((items) => {
+      const overrides: Record<string, RelOverride> = {};
+      const customs: typeof customRels = [];
+      const seenKeys = new Set<string>();
+      for (const item of items) {
+        const content = item.content as string;
+        if (!content) continue;
+        const match = content.match(/^\[rel:([^:]+):([^:]+)\]\s*([\s\S]+)$/);
+        if (!match) continue;
+        const [, fromId, toId, jsonStr] = match;
+        // Only load relationships relevant to this character
+        if (fromId !== charId && toId !== charId) continue;
+        const key = `${fromId}-${toId}`;
+        if (seenKeys.has(key)) continue; // first = newest, skip older
+        seenKeys.add(key);
+        try {
+          const parsed = JSON.parse(jsonStr);
+          if (parsed._custom) {
+            customs.push({ from: fromId, to: toId, label: parsed.label ?? "", tension: parsed.tension ?? "friend", scenePrompt: parsed.scenePrompt ?? "" });
+          } else {
+            overrides[key] = parsed;
+          }
+        } catch { /* ignore */ }
+      }
+      setRelOverrides(overrides);
+      setCustomRels(customs);
+    }).catch(() => {});
+  }, [charId]);
 
   if (!char) {
     return (
@@ -206,6 +254,34 @@ export default function CharacterDetailPage() {
     } finally {
       setSavingQ(null);
     }
+  }
+
+  async function saveRelOverride(fromId: string, toId: string, override: RelOverride & { _custom?: boolean }) {
+    const key = `${fromId}-${toId}`;
+    setSavingRelEdit(key);
+    try {
+      const marker = `[rel:${fromId}:${toId}]`;
+      await saveScratch(`${marker} ${JSON.stringify(override)}`);
+      if (!override._custom) {
+        setRelOverrides((prev) => ({ ...prev, [key]: override }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setSavingRelEdit(null);
+  }
+
+  async function handleAddRelationship() {
+    if (!newRelTo.trim() || !newRelLabel.trim()) return;
+    const toId = newRelTo.trim();
+    const newRel = { from: charId, to: toId, label: newRelLabel, tension: newRelTension, scenePrompt: newRelPrompt || `${charName}와(과) ${toId}의 관계를 보여주는 장면을 써보세요.` };
+    await saveRelOverride(charId, toId, { ...newRel, _custom: true });
+    setCustomRels((prev) => [newRel, ...prev.filter(r => !(r.from === charId && r.to === toId))]);
+    setAddingRel(false);
+    setNewRelTo("");
+    setNewRelLabel("");
+    setNewRelTension("friend");
+    setNewRelPrompt("");
   }
 
   async function handleSaveScene(sceneId: string, prompt: string) {
@@ -407,19 +483,88 @@ export default function CharacterDetailPage() {
       )}
 
       {/* ─── 4. 관계망 ─── */}
-      {relationships.length > 0 && (
+      {(relationships.length > 0 || customRels.length > 0) && (
         <section className="mb-8">
-          <h2 className="font-serif text-lg font-bold text-gray-800 mb-4">
-            관계망
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-serif text-lg font-bold text-gray-800">
+              관계망
+            </h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setAddingRel(!addingRel)}
+              className="gap-1 text-rose-500 hover:text-rose-700 border-rose-200"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              관계 추가
+            </Button>
+          </div>
+
+          {/* 새 관계 추가 폼 */}
+          {addingRel && (
+            <Card className="border-rose-200 border-dashed bg-rose-50/30 shadow-sm mb-4">
+              <CardContent className="pt-4 pb-4 space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <select
+                    value={newRelTo}
+                    onChange={(e) => setNewRelTo(e.target.value)}
+                    className="text-sm border border-rose-200 rounded px-2 py-1.5 bg-white"
+                  >
+                    <option value="">상대 인물 선택...</option>
+                    {CHARACTERS.filter((c) => c.id !== charId).map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                  <Input
+                    value={newRelLabel}
+                    onChange={(e) => setNewRelLabel(e.target.value)}
+                    placeholder="관계 설명 (예: 첫사랑)"
+                    className="w-40 h-8 text-sm"
+                  />
+                  <select
+                    value={newRelTension}
+                    onChange={(e) => setNewRelTension(e.target.value as TensionType)}
+                    className="text-sm border border-rose-200 rounded px-2 py-1.5 bg-white"
+                  >
+                    {Object.entries(TENSION_LABELS).map(([key, label]) => (
+                      <option key={key} value={key}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+                <Input
+                  value={newRelPrompt}
+                  onChange={(e) => setNewRelPrompt(e.target.value)}
+                  placeholder="장면 프롬프트 (비워두면 자동 생성)"
+                  className="h-8 text-sm"
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleAddRelationship} className="bg-rose-500 hover:bg-rose-600 text-white gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    추가
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setAddingRel(false)}>
+                    취소
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="space-y-4">
-            {relationships.map((rel) => {
+            {[...relationships, ...customRels].map((rel) => {
               const otherCharId =
                 rel.from === charId ? rel.to : rel.from;
               const otherChar = CHARACTERS.find((c) => c.id === otherCharId);
               const relKey = `${rel.from}-${rel.to}`;
+              const override = relOverrides[relKey];
+              const effectiveLabel = override?.label ?? rel.label;
+              const effectiveTension = override?.tension ?? rel.tension;
+              const effectivePrompt = override?.scenePrompt ?? rel.scenePrompt;
               const isOpen = openRelScene === relKey;
-              const existingAnswer = answeredMap[rel.scenePrompt];
+              const existingAnswer = answeredMap[effectivePrompt];
+              const isEditingLabel = editingRelLabel === relKey;
+              const isEditingPrompt = editingRelPrompt === relKey;
+              const isSaving = savingRelEdit === relKey;
 
               return (
                 <Card
@@ -432,14 +577,63 @@ export default function CharacterDetailPage() {
                         <span className="font-medium text-gray-800">
                           {otherChar?.name ?? otherCharId}
                         </span>
-                        <span className="text-sm text-gray-500">
-                          {rel.label}
-                        </span>
-                        <Badge
-                          className={`text-xs border ${TENSION_COLORS[rel.tension]}`}
+
+                        {/* Editable label */}
+                        {isEditingLabel ? (
+                          <span className="flex items-center gap-1">
+                            <Input
+                              autoFocus
+                              value={tempRelLabel}
+                              onChange={(e) => setTempRelLabel(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  const updated = { ...override, label: tempRelLabel };
+                                  saveRelOverride(rel.from, rel.to, updated);
+                                  setEditingRelLabel(null);
+                                } else if (e.key === "Escape") {
+                                  setEditingRelLabel(null);
+                                }
+                              }}
+                              onBlur={() => {
+                                if (tempRelLabel !== effectiveLabel) {
+                                  const updated = { ...override, label: tempRelLabel };
+                                  saveRelOverride(rel.from, rel.to, updated);
+                                }
+                                setEditingRelLabel(null);
+                              }}
+                              className="w-32 h-6 text-sm py-0 px-1.5"
+                            />
+                          </span>
+                        ) : (
+                          <span
+                            className="text-sm text-gray-500 cursor-pointer hover:text-gray-700 hover:underline decoration-dashed"
+                            onClick={() => {
+                              setEditingRelLabel(relKey);
+                              setTempRelLabel(effectiveLabel);
+                            }}
+                          >
+                            {effectiveLabel}
+                          </span>
+                        )}
+
+                        {/* Tension dropdown */}
+                        <select
+                          value={effectiveTension}
+                          onChange={(e) => {
+                            const newTension = e.target.value as TensionType;
+                            const updated = { ...override, tension: newTension };
+                            saveRelOverride(rel.from, rel.to, updated);
+                            // Update customRels if this is a custom relationship
+                            setCustomRels((prev) => prev.map((r) => `${r.from}-${r.to}` === relKey ? { ...r, tension: newTension } : r));
+                          }}
+                          className={`text-xs border rounded-full px-2 py-0.5 cursor-pointer ${TENSION_COLORS[effectiveTension]}`}
                         >
-                          {TENSION_LABELS[rel.tension]}
-                        </Badge>
+                          {Object.entries(TENSION_LABELS).map(([key, label]) => (
+                            <option key={key} value={key}>{label}</option>
+                          ))}
+                        </select>
+
+                        {isSaving && <span className="text-xs text-gray-400">저장 중...</span>}
                       </div>
                       <Button
                         variant="ghost"
@@ -454,6 +648,59 @@ export default function CharacterDetailPage() {
                       </Button>
                     </div>
 
+                    {/* Editable scene prompt (shown below label) */}
+                    {isEditingPrompt ? (
+                      <div className="mt-1 mb-2 flex items-start gap-1">
+                        <Textarea
+                          autoFocus
+                          value={tempRelPrompt}
+                          onChange={(e) => setTempRelPrompt(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              const updated = { ...override, scenePrompt: tempRelPrompt };
+                              saveRelOverride(rel.from, rel.to, updated);
+                              setEditingRelPrompt(null);
+                            } else if (e.key === "Escape") {
+                              setEditingRelPrompt(null);
+                            }
+                          }}
+                          className="text-xs min-h-[40px] border-amber-200 focus:border-amber-400"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const updated = { ...override, scenePrompt: tempRelPrompt };
+                            saveRelOverride(rel.from, rel.to, updated);
+                            setEditingRelPrompt(null);
+                          }}
+                          className="shrink-0 text-green-600 p-1 h-auto"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingRelPrompt(null)}
+                          className="shrink-0 text-gray-400 p-1 h-auto"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <p
+                        className="text-xs text-gray-400 mt-1 cursor-pointer hover:text-gray-600"
+                        onClick={() => {
+                          setEditingRelPrompt(relKey);
+                          setTempRelPrompt(effectivePrompt);
+                        }}
+                      >
+                        <Edit2 className="w-2.5 h-2.5 inline mr-1" />
+                        {effectivePrompt.length > 60 ? effectivePrompt.slice(0, 60) + "..." : effectivePrompt}
+                      </p>
+                    )}
+
                     {existingAnswer && !isOpen && (
                       <p className="text-sm text-green-700 bg-green-50 rounded p-2 mt-2 whitespace-pre-wrap">
                         {existingAnswer}
@@ -463,7 +710,7 @@ export default function CharacterDetailPage() {
                     {isOpen && (
                       <div className="mt-3 space-y-2">
                         <p className="text-sm text-gray-500 italic bg-amber-50 rounded p-2 border border-amber-100">
-                          {rel.scenePrompt}
+                          {effectivePrompt}
                         </p>
                         <Textarea
                           placeholder="여기에 장면을 써보세요..."
@@ -479,7 +726,7 @@ export default function CharacterDetailPage() {
                         <Button
                           size="sm"
                           onClick={() =>
-                            handleSaveRelScene(relKey, rel.scenePrompt)
+                            handleSaveRelScene(relKey, effectivePrompt)
                           }
                           disabled={savingRel === relKey}
                           className="bg-rose-500 hover:bg-rose-600 text-white"
