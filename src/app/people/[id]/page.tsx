@@ -59,6 +59,7 @@ export default function CharacterDetailPage() {
   const [editing, setEditing] = useState(false);
 
   // Editable character fields
+  const [charName, setCharName] = useState(char?.name ?? "");
   const [element, setElement] = useState(char?.element ?? "");
   const [animal, setAnimal] = useState(char?.animal ?? "");
   const [description, setDescription] = useState(char?.description ?? "");
@@ -71,6 +72,7 @@ export default function CharacterDetailPage() {
     getCharacterOverrides().then((overrides) => {
       const saved = overrides[char.name];
       if (saved) {
+        if (saved.name) setCharName(saved.name as string);
         if (saved.notes) setNotes(saved.notes as string);
         if (saved.element) setElement(saved.element as string);
         if (saved.animal) setAnimal(saved.animal as string);
@@ -83,10 +85,14 @@ export default function CharacterDetailPage() {
     if (!char) return;
     setSavingProfile(true);
     try {
-      await saveCharacterField(char.name, "element", element || null);
-      await saveCharacterField(char.name, "animal", animal || null);
-      await saveCharacterField(char.name, "description", description || null);
-      await saveCharacterField(char.name, "notes", notes || null);
+      const saveName = char.name; // 원본 이름으로 DB 조회
+      if (charName !== char.name) {
+        await saveCharacterField(saveName, "name", charName);
+      }
+      await saveCharacterField(saveName, "element", element || null);
+      await saveCharacterField(saveName, "animal", animal || null);
+      await saveCharacterField(saveName, "description", description || null);
+      await saveCharacterField(saveName, "notes", notes || null);
       setEditingProfile(false);
     } catch (err) {
       console.error(err);
@@ -231,14 +237,22 @@ export default function CharacterDetailPage() {
       <div className="flex items-start gap-6 mb-8">
         <div className="w-28 h-36 bg-gradient-to-b from-rose-100 to-amber-50 rounded-lg flex items-center justify-center shrink-0 border border-rose-200">
           <span className="font-serif text-5xl text-rose-300">
-            {char.name[0]}
+            {charName[0] || "?"}
           </span>
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2 flex-wrap">
-            <h1 className="font-serif text-2xl font-bold text-gray-800">
-              {char.name}
-            </h1>
+            {editingProfile ? (
+              <Input
+                value={charName}
+                onChange={(e) => setCharName(e.target.value)}
+                className="font-serif text-2xl font-bold h-10 w-48"
+              />
+            ) : (
+              <h1 className="font-serif text-2xl font-bold text-gray-800">
+                {charName}
+              </h1>
+            )}
             {editingProfile ? (
               <>
                 <div className="flex items-center gap-1.5">
