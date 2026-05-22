@@ -95,6 +95,9 @@ export default function CharacterDetailPage() {
   const [savingQ, setSavingQ] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
+  // Memo → Question picker
+  const [showQuestionPicker, setShowQuestionPicker] = useState(false);
+
   // Scene prompts
   const [openScene, setOpenScene] = useState<string | null>(null);
   const [sceneText, setSceneText] = useState<Record<string, string>>({});
@@ -686,37 +689,106 @@ export default function CharacterDetailPage() {
           <CardTitle className="text-sm font-medium text-gray-700">
             메모
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setEditing(!editing)}
-            className="gap-1.5 text-rose-500 hover:text-rose-700"
-          >
-            {editing ? (
-              <>
-                <Save className="w-3.5 h-3.5" />
-                저장
-              </>
-            ) : (
-              <>
-                <Edit2 className="w-3.5 h-3.5" />
-                편집
-              </>
+          <div className="flex gap-2">
+            {notes.trim().length > 30 && !editing && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowQuestionPicker((v) => !v)}
+                className="gap-1.5 text-amber-600 hover:text-amber-800 border-amber-200"
+              >
+                <Pen className="w-3.5 h-3.5" />
+                {showQuestionPicker ? "접기" : "질문에 반영"}
+              </Button>
             )}
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setEditing(!editing)}
+              className="gap-1.5 text-rose-500 hover:text-rose-700"
+            >
+              {editing ? (
+                <>
+                  <Save className="w-3.5 h-3.5" />
+                  저장
+                </>
+              ) : (
+                <>
+                  <Edit2 className="w-3.5 h-3.5" />
+                  편집
+                </>
+              )}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {editing ? (
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
+              placeholder="길게 붙여넣으면 캐릭터 질문 답변으로 활용 가능"
               className="min-h-[120px] text-sm border-rose-200 focus:border-rose-400"
             />
           ) : (
             <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
-              {notes || "아직 메모가 없습니다."}
+              {notes || "아직 메모가 없습니다. 길게 붙여넣으면 캐릭터 질문 답변으로 활용할 수 있어요."}
             </p>
           )}
+
+          {/* 미답변 질문에 반영 패널 */}
+          {showQuestionPicker && (
+            <div className="mt-4 border-t border-amber-100 pt-4">
+              <p className="text-xs text-amber-600 mb-3">미답변 질문을 클릭하면 메모 내용이 답변으로 저장됩니다</p>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {questions.filter((q) => !answeredMap[q.question]).length === 0 ? (
+                  <p className="text-xs text-gray-400">모든 질문에 답변 완료!</p>
+                ) : (
+                  questions
+                    .filter((q) => !answeredMap[q.question])
+                    .map((q) => (
+                      <button
+                        key={q.id}
+                        onClick={async () => {
+                          setSavingQ(q.question);
+                          try {
+                            await saveBrainstorm(q.question, notes, `character-${charId}`);
+                            setAnsweredMap((prev) => ({ ...prev, [q.question]: notes }));
+                          } catch { /* ignore */ }
+                          setSavingQ(null);
+                        }}
+                        disabled={savingQ === q.question}
+                        className="w-full text-left text-sm p-2.5 rounded-lg border border-amber-100 hover:bg-amber-50 hover:border-amber-300 transition-colors disabled:opacity-50"
+                      >
+                        <span className="text-xs text-amber-500 mr-1.5">{CHARACTER_Q_CATEGORIES[q.category] ?? q.category}</span>
+                        {q.question}
+                        {savingQ === q.question && <span className="text-xs text-amber-400 ml-2">저장 중...</span>}
+                      </button>
+                    ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 떡밥 자동 수집 */}
+          {(() => {
+            const lines = notes.split("\n").filter((line) =>
+              /떡밥|복선|미회수|발전.*가능|열린.*결말|떠넘|나중에|이후에|아직|비밀|숨기|감추|단서/.test(line)
+            );
+            if (lines.length === 0) return null;
+            return (
+              <div className="mt-4 border-t border-pink-100 pt-4">
+                <p className="text-xs text-pink-500 font-medium mb-2">떡밥 / 발전 가능 요소 ({lines.length}개)</p>
+                <div className="space-y-1.5">
+                  {lines.map((line, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm bg-pink-50 rounded p-2 border border-pink-100">
+                      <span className="text-pink-400 shrink-0">*</span>
+                      <span className="text-pink-700">{line.trim()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
     </div>
