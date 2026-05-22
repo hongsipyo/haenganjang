@@ -27,28 +27,99 @@ import {
   getFilledEpisodes,
   getTotalFragments,
   getTotalCharacters,
-  PLOT_BEATS,
+  EPISODES,
 } from "@/lib/data";
+import {
+  getFragments,
+  getScenes,
+  getCharacterOverrides,
+  getScratchItems,
+} from "@/lib/supabase/actions";
 
 const ENCOURAGEMENTS = [
-  "오늘도 한 씬이면 충분해",
-  "팬티를 찢어라",
-  "개그는 디테일이다",
-  "장관님, 오늘도 출근하셨군요",
-  "웃기면 정의다",
+  "오늘도 한 줄이면 충분해",
+  "쓰는 것만으로 이미 대단해",
+  "천천히, 네 속도로",
+  "다정아, 오늘도 와줬구나",
+  "한 문장이 한 세계를 만들어",
 ];
+
+interface DbStats {
+  dbFragments: number;
+  dbScenes: number;
+  dbCharacters: number;
+  dbScratchItems: number;
+  dbEpisodesWithScenes: number;
+}
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
+  const [dbStats, setDbStats] = useState<DbStats | null>(null);
 
   useEffect(() => {
     setMounted(true);
+
+    // Fetch real counts from DB
+    async function fetchDbStats() {
+      try {
+        const [fragments, scenes, characterOverrides, scratchItems] =
+          await Promise.all([
+            getFragments(),
+            getScenes(),
+            getCharacterOverrides(),
+            getScratchItems(),
+          ]);
+
+        // Count unique episodes that have written scenes in DB
+        const episodesWithScenes = new Set(
+          scenes
+            .filter((s) => s.episode_number != null)
+            .map((s) => s.episode_number)
+        ).size;
+
+        setDbStats({
+          dbFragments: fragments.length,
+          dbScenes: scenes.length,
+          dbCharacters: Object.keys(characterOverrides).length,
+          dbScratchItems: scratchItems.length,
+          dbEpisodesWithScenes: episodesWithScenes,
+        });
+      } catch (err) {
+        console.error("Failed to fetch DB stats:", err);
+        // Keep showing hardcoded data on error
+      }
+    }
+
+    fetchDbStats();
   }, []);
 
-  const overallProgress = getOverallProgress();
-  const filledEpisodes = getFilledEpisodes();
-  const totalFragments = getTotalFragments();
-  const totalCharacters = getTotalCharacters();
+  // Hardcoded baseline stats
+  const hardcodedProgress = getOverallProgress();
+  const hardcodedFilledEpisodes = getFilledEpisodes();
+  const hardcodedFragments = getTotalFragments();
+  const hardcodedCharacters = getTotalCharacters();
+
+  // Merge: combine hardcoded + DB counts
+  // Fragments: hardcoded (data.ts) + DB fragments (no overlap — DB stores user-created ones)
+  const totalFragments = dbStats
+    ? hardcodedFragments + dbStats.dbFragments
+    : hardcodedFragments;
+
+  // Characters: hardcoded baseline; DB overrides share names, so use max of both
+  // DB characters with new names (not in hardcoded) add to the count
+  const totalCharacters = dbStats
+    ? hardcodedCharacters + dbStats.dbCharacters
+    : hardcodedCharacters;
+
+  // Filled episodes: hardcoded filled + any new episodes that only exist in DB scenes
+  const filledEpisodes = dbStats
+    ? hardcodedFilledEpisodes + dbStats.dbEpisodesWithScenes
+    : hardcodedFilledEpisodes;
+
+  // Progress: factor in DB scenes (each written scene contributes to overall progress)
+  const overallProgress = dbStats
+    ? Math.min(100, hardcodedProgress + Math.round((dbStats.dbScenes * 2) / 16))
+    : hardcodedProgress;
   const dailyMission = getDailyMission();
   const dailyFragment = getDailyFragment();
 
@@ -64,41 +135,41 @@ export default function HomePage() {
       {/* ── Cover Section ── */}
       <section className="text-center space-y-6">
         <div className="relative inline-block">
-          <div className="w-44 h-60 mx-auto rounded-xl overflow-hidden shadow-lg shadow-red-300/40 border border-red-300/60">
-            {/* Bold action comedy book cover */}
-            <div className="w-full h-full relative bg-gradient-to-br from-red-50 via-orange-50 to-amber-50">
-              {/* Bold warm glow */}
-              <div className="absolute inset-0 bg-gradient-to-t from-red-200/30 via-transparent to-orange-100/20" />
+          <div className="w-44 h-60 mx-auto rounded-xl overflow-hidden shadow-lg shadow-rose-200/40 border border-rose-200/60">
+            {/* Warm light book cover */}
+            <div className="w-full h-full relative bg-gradient-to-br from-amber-50 via-rose-50 to-yellow-50">
+              {/* Soft warm glow */}
+              <div className="absolute inset-0 bg-gradient-to-t from-amber-200/30 via-transparent to-rose-100/20" />
               {/* Decorative lines */}
-              <div className="absolute top-6 left-4 right-4 h-px bg-red-400/40" />
-              <div className="absolute bottom-6 left-4 right-4 h-px bg-red-400/40" />
+              <div className="absolute top-6 left-4 right-4 h-px bg-rose-300/40" />
+              <div className="absolute bottom-6 left-4 right-4 h-px bg-rose-300/40" />
               {/* Title */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                <span className="font-serif text-2xl font-bold tracking-tight bg-gradient-to-b from-red-500 to-orange-500 bg-clip-text text-transparent leading-tight text-center px-2">
-                  행안부장관
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                <span className="font-serif text-5xl font-bold tracking-tight bg-gradient-to-b from-rose-400 to-amber-500 bg-clip-text text-transparent">
+                  다정
                 </span>
-                <span className="text-[9px] tracking-[0.2em] text-red-400/70 uppercase">
-                  web novel &middot; webtoon &middot; film
+                <span className="text-[9px] tracking-[0.3em] text-rose-400/70 uppercase">
+                  a novel &middot; screenplay
                 </span>
-                <span className="text-[10px] tracking-[0.2em] text-orange-600/70 mt-3 font-medium">
+                <span className="text-[10px] tracking-[0.2em] text-amber-600/70 mt-4 font-medium">
                   홍시표
                 </span>
               </div>
               {/* Spine shadow */}
-              <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-red-200/30 to-transparent" />
+              <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-amber-200/30 to-transparent" />
             </div>
           </div>
-          <div className="absolute -inset-8 bg-gradient-to-b from-red-100/40 via-orange-100/30 to-transparent rounded-3xl -z-10 blur-2xl" />
+          <div className="absolute -inset-8 bg-gradient-to-b from-rose-100/40 via-amber-100/30 to-transparent rounded-3xl -z-10 blur-2xl" />
         </div>
         <div className="space-y-2">
-          <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-red-900">
-            행안부장관
+          <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-rose-900">
+            다정
           </h1>
-          <p className="text-orange-800/70 text-lg md:text-xl max-w-md mx-auto leading-relaxed">
-            규칙을 지킨 관료의 팬티가 찢어지는 정치풍자 코미디
+          <p className="text-amber-800/70 text-lg md:text-xl max-w-md mx-auto leading-relaxed">
+            내 젊음을 농축한 16부작 드라마 &middot; 소설
           </p>
           {mounted && (
-            <p className="text-sm text-red-400/80 flex items-center justify-center gap-1.5 pt-1">
+            <p className="text-sm text-rose-400/80 flex items-center justify-center gap-1.5 pt-1">
               <Sun className="w-3.5 h-3.5" />
               {encouragement}
             </p>
@@ -122,8 +193,8 @@ export default function HomePage() {
           },
           {
             icon: Layers,
-            label: "플롯 비트",
-            value: `${filledEpisodes}/${PLOT_BEATS.length}`,
+            label: "채워진 회차",
+            value: `${filledEpisodes}/16`,
             bg: "bg-emerald-50",
             color: "text-emerald-500",
             border: "border-emerald-100",
@@ -162,53 +233,63 @@ export default function HomePage() {
         ))}
       </section>
 
-      {/* ── 플롯 진행률 ── */}
+      {/* ── 16부작 진행률 Grid ── */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-amber-700/80 uppercase tracking-wider">
-            플롯 진행률
+            16부작 진행률
           </h2>
           <span className="text-xs text-rose-400/70">
-            {filledEpisodes}개 비트 시작됨
+            {filledEpisodes}개 시작됨 -- 잘 하고 있어!
           </span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {PLOT_BEATS.map((beat) => {
-            const actColors: Record<string, string> = {
-              "발단": "text-amber-700 bg-amber-50 border-amber-200/60",
-              "전개": "text-blue-700 bg-blue-50 border-blue-200/60",
-              "위기": "text-rose-700 bg-rose-50 border-rose-200/60",
-              "절정": "text-red-700 bg-red-50 border-red-200/60",
-              "결말": "text-emerald-700 bg-emerald-50 border-emerald-200/60",
-            };
-            const colorClass = actColors[beat.act] || "text-gray-700 bg-gray-50 border-gray-200/60";
+        <div className="grid grid-cols-4 gap-3">
+          {EPISODES.map((ep) => {
+            const isFilled =
+              ep.title !== null ||
+              ep.synopsis !== null ||
+              ep.scenes.length > 0;
             return (
               <Card
-                key={beat.id}
-                className={`relative overflow-hidden transition-all duration-300 ${colorClass} shadow-sm`}
+                key={ep.number}
+                className={`relative overflow-hidden transition-all duration-300 ${
+                  isFilled
+                    ? "bg-white border-rose-200/60 shadow-md shadow-rose-100/50"
+                    : "bg-amber-50/50 border-dashed border-amber-200/60"
+                }`}
               >
                 <CardContent className="p-3 space-y-2">
                   <div className="flex items-baseline justify-between">
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] px-1.5 py-0 border-0 bg-white/60"
+                    <span
+                      className={`text-xs font-medium ${
+                        isFilled ? "text-rose-700" : "text-amber-400"
+                      }`}
                     >
-                      {beat.act}
-                    </Badge>
-                    {beat.progress > 0 && (
+                      {ep.number}부
+                    </span>
+                    {ep.progress > 0 && (
                       <Badge
                         variant="secondary"
                         className="text-[10px] px-1.5 py-0 bg-amber-100 text-amber-700 border-0"
                       >
-                        {beat.progress}%
+                        {ep.progress}%
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs font-medium truncate leading-relaxed">
-                    {beat.title}
-                  </p>
-                  <Progress value={beat.progress} className="h-1" />
+                  {isFilled ? (
+                    <p className="text-xs text-gray-600 truncate leading-relaxed">
+                      {ep.title || ep.firstLine || "untitled"}
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-amber-300 italic">
+                      여기 채워질 거야
+                    </p>
+                  )}
+                  <Progress value={ep.progress} className="h-1" />
                 </CardContent>
+                {isFilled && ep.progress > 0 && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent pointer-events-none" />
+                )}
               </Card>
             );
           })}
@@ -291,15 +372,15 @@ export default function HomePage() {
           듀얼 트래커
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
-          {/* 웹소설 */}
+          {/* 소설 */}
           <Card className="bg-white border-emerald-200/50 shadow-sm">
             <CardContent className="p-5 space-y-3">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-emerald-500" />
-                <h3 className="font-medium text-sm text-gray-800">웹소설</h3>
+                <h3 className="font-medium text-sm text-gray-800">소설</h3>
               </div>
               <p className="text-xs text-gray-500">
-                정치풍자 코미디 &middot; 오행 시스템
+                성석제 나레이션 + 매지컬 리얼리즘
               </p>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-gray-500">
@@ -309,22 +390,22 @@ export default function HomePage() {
                 <Progress value={0} className="h-1.5" />
               </div>
               <p className="text-[11px] text-emerald-400 italic">
-                첫 팬티가 찢어지는 순간을 써보자
+                첫 문장을 쓰는 날이 시작이야
               </p>
             </CardContent>
           </Card>
 
-          {/* 웹툰/영화 각본 */}
+          {/* 드라마 각본 */}
           <Card className="bg-white border-violet-200/50 shadow-sm">
             <CardContent className="p-5 space-y-3">
               <div className="flex items-center gap-2">
                 <Clapperboard className="w-4 h-4 text-violet-500" />
                 <h3 className="font-medium text-sm text-gray-800">
-                  웹툰 / 영화
+                  드라마 각본
                 </h3>
               </div>
               <p className="text-xs text-gray-500">
-                액션 코미디 &middot; 관료 vs 관료
+                옴니버스 16부작 &middot; 안나 카레니나 구조
               </p>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-gray-500">
@@ -334,7 +415,7 @@ export default function HomePage() {
                 <Progress value={0} className="h-1.5" />
               </div>
               <p className="text-[11px] text-violet-400 italic">
-                구조가 서면 개그는 따라와
+                구조가 서면 장면은 따라와
               </p>
             </CardContent>
           </Card>
@@ -343,11 +424,11 @@ export default function HomePage() {
 
       {/* ── Footer ── */}
       <footer className="text-center pt-4 pb-8 space-y-1">
-        <p className="text-xs text-red-300">
+        <p className="text-xs text-rose-300">
           작가 홍시표의 작업 공간
         </p>
-        <p className="text-[11px] text-orange-300/80">
-          매일 조금씩, 팬티가 찢어질 때까지
+        <p className="text-[11px] text-amber-300/80">
+          매일 조금씩, 다정하게
         </p>
       </footer>
     </div>

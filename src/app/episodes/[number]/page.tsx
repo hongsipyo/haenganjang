@@ -7,11 +7,25 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, Save } from "lucide-react";
+import { ArrowLeft, Plus, Save, Loader2, Check } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { EPISODES } from "@/lib/data";
+import { getScratchItems, saveScratch, deleteScratch, logActivity } from "@/lib/supabase/actions";
+
+type SaveState = "idle" | "saving" | "saved";
+
+/** Scratch content markers for episode fields */
+function makeMarker(epNum: number, field: string) {
+  return `[episode:${epNum}:${field}]`;
+}
+
+function parseMarker(content: string): { epNum: number; field: string; value: string } | null {
+  const match = content.match(/^\[episode:(\d+):(\w+)\]\n?([\s\S]*)$/);
+  if (!match) return null;
+  return { epNum: Number(match[1]), field: match[2], value: match[3] };
+}
 
 export default function EpisodeDetailPage() {
   const params = useParams();
@@ -20,6 +34,101 @@ export default function EpisodeDetailPage() {
   const [title, setTitle] = useState(ep?.title ?? "");
   const [synopsis, setSynopsis] = useState(ep?.synopsis ?? "");
   const [progress, setProgress] = useState(ep?.progress ?? 0);
+  const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [, setLoaded] = useState(false);
+
+  // Track scratch IDs so we can delete old values before saving new ones
+  const [scratchIds, setScratchIds] = useState<Record<string, string>>({});
+
+  // Load saved data from DB on mount
+  useEffect(() => {
+    if (!ep) return;
+    let cancelled = false;
+
+    async function loadFromDb() {
+      try {
+        const items = await getScratchItems();
+        if (cancelled) return;
+
+        const ids: Record<string, string> = {};
+
+        for (const item of items) {
+          const content = item.content as string;
+          const id = item.id as string;
+          const parsed = parseMarker(content);
+          if (!parsed || parsed.epNum !== ep!.number) continue;
+
+          // Only take the first (latest) match per field
+          if (ids[parsed.field]) continue;
+          ids[parsed.field] = id;
+
+          switch (parsed.field) {
+            case "title":
+              setTitle(parsed.value);
+              break;
+            case "synopsis":
+              setSynopsis(parsed.value);
+              break;
+            case "progress":
+              setProgress(Number(parsed.value) || 0);
+              break;
+          }
+        }
+
+        setScratchIds(ids);
+      } catch (err) {
+        console.error("Failed to load episode data:", err);
+      } finally {
+        if (!cancelled) setLoaded(true);
+      }
+    }
+
+    loadFromDb();
+    return () => { cancelled = true; };
+  }, [ep]);
+
+  const handleSave = useCallback(async () => {
+    if (!ep || saveState === "saving") return;
+    setSaveState("saving");
+
+    try {
+      const fields = [
+        { field: "title", value: title },
+        { field: "synopsis", value: synopsis },
+        { field: "progress", value: String(progress) },
+      ];
+
+      const newIds: Record<string, string> = {};
+
+      for (const { field, value } of fields) {
+        // Delete old scratch item for this field
+        const oldId = scratchIds[field];
+        if (oldId) {
+          try {
+            await deleteScratch(oldId);
+          } catch {
+            // ignore delete errors
+          }
+        }
+
+        // Save new value
+        const content = `${makeMarker(ep.number, field)}\n${value}`;
+        const result = await saveScratch(content);
+        if (result?.id) {
+          newIds[field] = result.id;
+        }
+      }
+
+      setScratchIds((prev) => ({ ...prev, ...newIds }));
+      await logActivity("episode_saved", `${ep.number}부 저장`, "episodes");
+
+      setSaveState("saved");
+      setTimeout(() => setSaveState("idle"), 1500);
+    } catch (err) {
+      console.error("Failed to save episode:", err);
+      setSaveState("idle");
+    }
+  }, [ep, title, synopsis, progress, scratchIds, saveState]);
 
   if (!ep) {
     return (
@@ -149,9 +258,23 @@ export default function EpisodeDetailPage() {
       )}
 
       <div className="flex justify-end">
-        <Button className="gap-1.5">
-          <Save className="w-4 h-4" />
-          저장
+        <Button
+          className="gap-1.5"
+          onClick={handleSave}
+          disabled={saveState === "saving"}
+        >
+          {saveState === "saving" ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : saveState === "saved" ? (
+            <Check className="w-4 h-4" />
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
+          {saveState === "saving"
+            ? "저장 중..."
+            : saveState === "saved"
+              ? "저장됨"
+              : "저장"}
         </Button>
       </div>
     </div>

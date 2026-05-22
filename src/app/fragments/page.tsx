@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -13,9 +13,11 @@ import {
   Clock,
   Tag,
   Plus,
+  Database,
 } from "lucide-react";
 import { FRAGMENTS } from "@/lib/data";
 import type { FragmentData } from "@/lib/data";
+import { getFragments } from "@/lib/supabase/actions";
 
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -28,7 +30,8 @@ function timeAgo(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("ko-KR");
 }
 
-function FragmentIcon({ type }: { type: FragmentData["type"] }) {
+function FragmentIcon({ type, fromDb }: { type: FragmentData["type"]; fromDb?: boolean }) {
+  if (fromDb) return <Database className="w-3.5 h-3.5" />;
   switch (type) {
     case "voice":
       return <Mic className="w-3.5 h-3.5" />;
@@ -39,13 +42,46 @@ function FragmentIcon({ type }: { type: FragmentData["type"] }) {
   }
 }
 
+interface DisplayFragment extends FragmentData {
+  fromDb?: boolean;
+}
+
 export default function FragmentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [allFragments, setAllFragments] = useState<DisplayFragment[]>(
+    FRAGMENTS.map((f) => ({ ...f, fromDb: false }))
+  );
 
-  const allTags = Array.from(new Set(FRAGMENTS.flatMap((f) => f.tags)));
+  useEffect(() => {
+    async function loadDbFragments() {
+      try {
+        const dbRows = await getFragments();
+        const dbFragments: DisplayFragment[] = dbRows.map((row) => ({
+          id: (row.id as string) ?? crypto.randomUUID(),
+          content: (row.content as string) ?? "",
+          tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+          type: ((row.type as string) ?? "text") as FragmentData["type"],
+          createdAt: (row.created_at as string) ?? new Date().toISOString(),
+          fromDb: true,
+        }));
 
-  const filtered = FRAGMENTS.filter((f) => {
+        // Merge: DB fragments first, then hardcoded (avoid duplicates by content)
+        const dbContentSet = new Set(dbFragments.map((f) => f.content));
+        const hardcoded = FRAGMENTS.filter((f) => !dbContentSet.has(f.content)).map(
+          (f) => ({ ...f, fromDb: false })
+        );
+        setAllFragments([...dbFragments, ...hardcoded]);
+      } catch {
+        // DB unavailable — keep hardcoded only
+      }
+    }
+    loadDbFragments();
+  }, []);
+
+  const allTags = Array.from(new Set(allFragments.flatMap((f) => f.tags)));
+
+  const filtered = allFragments.filter((f) => {
     if (selectedTag && !f.tags.includes(selectedTag)) return false;
     if (searchQuery && !f.content?.toLowerCase().includes(searchQuery.toLowerCase()))
       return false;
@@ -113,7 +149,7 @@ export default function FragmentsPage() {
             <CardContent className="p-5">
               <div className="flex items-start gap-3">
                 <div className="mt-1 p-1.5 rounded-md bg-secondary">
-                  <FragmentIcon type={fragment.type} />
+                  <FragmentIcon type={fragment.type} fromDb={fragment.fromDb} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
@@ -134,6 +170,14 @@ export default function FragmentsPage() {
                           {tag}
                         </Badge>
                       ))}
+                      {fragment.fromDb && (
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] px-1.5 py-0"
+                        >
+                          DB
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </div>

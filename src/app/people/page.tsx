@@ -1,10 +1,13 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { CHARACTERS } from "@/lib/data";
+import type { CharacterData } from "@/lib/data";
+import { getCharacterOverrides } from "@/lib/supabase/actions";
 
 function getElementColor(element: string | null) {
   if (!element) return "bg-secondary text-secondary-foreground";
@@ -17,6 +20,32 @@ function getElementColor(element: string | null) {
 }
 
 export default function PeoplePage() {
+  const [characters, setCharacters] = useState<CharacterData[]>(CHARACTERS);
+
+  useEffect(() => {
+    async function loadOverrides() {
+      try {
+        const overrides = await getCharacterOverrides();
+        if (Object.keys(overrides).length === 0) return;
+
+        const merged = CHARACTERS.map((char) => {
+          const override = overrides[char.name];
+          if (!override) return char;
+          return {
+            ...char,
+            description: (override.description as string) ?? char.description,
+            element: override.element !== undefined ? (override.element as string | null) : char.element,
+            animal: override.animal !== undefined ? (override.animal as string | null) : char.animal,
+          };
+        });
+        setCharacters(merged);
+      } catch {
+        // DB unavailable — keep hardcoded only
+      }
+    }
+    loadOverrides();
+  }, []);
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
       <div className="flex items-center justify-between mb-8">
@@ -31,7 +60,7 @@ export default function PeoplePage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {CHARACTERS.map((char) => (
+        {characters.map((char) => (
           <Link key={char.id} href={`/people/${char.id}`}>
             <Card className="group hover:border-primary/30 transition-all hover:-translate-y-0.5 cursor-pointer h-full">
               <CardContent className="p-0">

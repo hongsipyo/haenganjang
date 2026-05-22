@@ -5,8 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Globe, ImageIcon, Music, FileText, Plus, ExternalLink, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Globe, ImageIcon, Music, FileText, Plus, ExternalLink, Trash2, Save, Loader2, Check } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { saveScratch, getScratchItems, deleteScratch } from "@/lib/supabase/actions";
+
+const MARKER_NOTES = "[world:notes]";
+const MARKER_MUSIC = "[world:music]";
 
 interface MusicItem {
   id: string;
@@ -16,7 +20,57 @@ interface MusicItem {
   note: string;
 }
 
-const INITIAL_MUSIC: MusicItem[] = [
+const DEFAULT_MEMO = `시대: 2020년대 초중반, 광명
+톤: 매지컬 리얼리즘 + 한국적 정서
+서술: 3인칭인데 1인칭에 존나 가까움, 객관화 시도하다 실패
+
+━━━ 핵심 법칙 ━━━
+
+속성 시스템 — 사람마다 물/불/흙/금/나무 속성이 있음. 속성이 물이면 물에 닿으면 기분 좋아짐. 옷이 황토 재질이면 퍼포먼스 떨어짐. 가볍게, 재미용.
+
+사물의 도움 — 사물들은 모두 도움을 준다. 잘 정돈하고 매만지면. → 다정이 ADHD: 정리하면 사물이 도와주는데, 정리를 못 하니까 도움을 못 받음.
+
+수면과 시공간 — 어제와 오늘 사이엔 수많은 시공간이 있는데, 이 열차는 대개 탈선하지 않음. 자다가 죽을 경우 탈선하기도 함.
+
+신성과 소음 — 어릴때 가진 신성을 소음으로 뒤덮는다. 목표는 신성 잃지 않기. 다정이가 어른이 되면서 할머니가 안 보이게 되는 이유.
+
+기억의 소거 — 아기 때의 기억이 지워지는 이유: 그때는 세상의 비밀을 알고 있기 때문. 꿈을 잊게 되는 이유도 같음.
+
+파스칼 — "오직 보기를 원하는 자에게는 충분한 빛이 있고, 이와 반대되는 마음을 가진 자들에게는 충분한 어둠이 있다." → 할머니가 다정이에게만 보이는 이유.
+
+━━━ 모티프 ━━━
+
+핑크색 풍선 — 어릴 때 힘들면 핑크색 풍선으로 회피. 사랑에 빠지면 핑크색 풍선 나타남. 파랑색 풍선과 부풀어오름(썸) → 터짐.
+
+할머니 수호신 — 라이프오브파이처럼 환상/현실 불명확. 호메로스/서유기처럼 보이지 않는 것들이 뒤에서 도움. 다정이 더이상 필요 없어지면 사라짐.
+
+밥그릇 — 정우 트라우마. 어릴 때 밥그릇 없어서 환영 봄, 사랑의 표시로 밥그릇 줌.
+
+온기 — 여자는 (온기)로 덥혀져야 하는데 그 온기는 엄마가 (볼)로 전달.
+
+사랑의 시각적 변화 — 흰우유→딸기우유, 주변 모든 것 바뀜.
+
+찰나의 기억 — 프루스트의 마들렌처럼 찰나에 오는 것들. 눈꺼풀 뒤에 있는 것들. 파편이라는 개념 자체가 이것.
+
+━━━ 연출 ━━━
+
+ADHD 연출 — 인사이드아웃식. 팽이 돌아가며 DDR(racing thoughts). 머릿속 7개 채널.
+
+비유 톤 — "철사, 뱀" 같은 불길한 사물로 환기하기.
+
+고르기아스 — "탁월한 문장은 언어를 통해 기쁨을 주고 슬픔을 가져간다. 마법이 가진 두 가지 기술 — 영혼을 혼란시키고 생각을 속이는 것."
+
+━━━ 격언 ━━━
+
+무엇이든 그것만 기다리고 있는 자에게는 그것이 오지 않는다. 마치 전여친의 연락처럼.
+
+누구나 입이 가벼운 자에게는 비밀을 맡기고 싶지 않아 하는 법이다.
+
+알고 싶은 것보다 모르고 싶은 게 더 많아지는 시기를 지나고 있었다.
+
+어른이란 많은 실수를 저지른 사람을 일컫는다.`;
+
+const DEFAULT_MUSIC: MusicItem[] = [
   {
     id: "1",
     title: "Leave the Door Open",
@@ -34,68 +88,112 @@ const INITIAL_MUSIC: MusicItem[] = [
 ];
 
 export default function WorldPage() {
-  const [memoContent, setMemoContent] = useState(
-    `시대: 근미래 대한민국
-톤: 정치풍자 코미디 + 액션 + 판타지
-장르: 웹소설 / 웹툰 / 영화
-
-━━━ 오행 시스템 ━━━
-
-장관들마다 오행 속성이 있음 (목/화/토/금/수)
-속성에 따라 능력과 약점이 다름
-속성 상극 관계가 정치적 갈등과 연결
-예: 행안부 장관(토) vs 국방부 장관(목) — 토극수, 목극토
-
-━━━ 봉인된 힘 ━━━
-
-각 장관직에는 봉인된 힘이 있음
-규칙을 완벽히 지키면 역설적으로 봉인이 풀림
-봉인이 풀리면 팬티가 찢어짐 (물리적으로)
-팬티 찢어짐 = 각성의 시각적 표현
-
-━━━ 공무원 사회 풍자 ━━━
-
-관료제의 비효율을 능력 시스템으로 치환
-결재 라인이 길수록 능력 약화
-직급 체계 = 파워 레벨
-감사원 = 디버프 시전자
-국회 = 레이드 보스
-
-━━━ 정치 코미디 톤 ━━━
-
-진지한 상황 + 바보 같은 결과
-규칙을 지키려는 선의가 재앙을 부름
-악당은 합법적으로 나쁜 짓을 함
-웃기지만 슬프고, 슬프지만 웃김
-"법대로 하겠습니다" = 이 작품의 "아멘"
-
-━━━ 모티프 ━━━
-
-팬티 — 관료의 체면, 격식, 위선의 상징. 찢어지면 본모습 드러남.
-도장 — 결재 도장이 곧 마법 인장. 위조 도장은 저주.
-넥타이 — 목을 조이는 것 = 규율에 의한 억압. 풀면 해방.
-명함 — 정체성의 전부. 명함 없으면 투명인간.
-
-━━━ 격언 ━━━
-
-법대로 하면 다 죽는다. 그래서 법대로 안 하는 거다.
-
-공무원의 가장 강력한 무기는 "검토하겠습니다"이다.
-
-장관은 바뀌어도 과장은 영원하다.
-
-팬티가 찢어질 때 비로소 인간이 된다.`
-  );
-
-  const [musicList, setMusicList] = useState<MusicItem[]>(INITIAL_MUSIC);
+  const [memoContent, setMemoContent] = useState(DEFAULT_MEMO);
+  const [musicList, setMusicList] = useState<MusicItem[]>(DEFAULT_MUSIC);
   const [newTitle, setNewTitle] = useState("");
   const [newArtist, setNewArtist] = useState("");
   const [newUrl, setNewUrl] = useState("");
   const [newNote, setNewNote] = useState("");
 
+  // DB row IDs for upsert (delete old + insert new)
+  const [notesDbId, setNotesDbId] = useState<string | null>(null);
+  const [musicDbId, setMusicDbId] = useState<string | null>(null);
+
+  // Save status indicators
+  const [notesSaving, setNotesSaving] = useState(false);
+  const [notesSaved, setNotesSaved] = useState(false);
+  const [musicSaving, setMusicSaving] = useState(false);
+  const [musicSaved, setMusicSaved] = useState(false);
+  const [, setLoaded] = useState(false);
+
+  // Load saved data on mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const items = await getScratchItems();
+
+        // Find most recent notes entry
+        const notesItem = items.find(
+          (item) => typeof item.content === "string" && item.content.startsWith(MARKER_NOTES)
+        );
+        if (notesItem && typeof notesItem.content === "string") {
+          setMemoContent(notesItem.content.slice(MARKER_NOTES.length));
+          setNotesDbId(notesItem.id as string);
+        }
+
+        // Find most recent music entry
+        const musicItem = items.find(
+          (item) => typeof item.content === "string" && item.content.startsWith(MARKER_MUSIC)
+        );
+        if (musicItem && typeof musicItem.content === "string") {
+          try {
+            const parsed = JSON.parse(musicItem.content.slice(MARKER_MUSIC.length));
+            if (Array.isArray(parsed)) {
+              setMusicList(parsed);
+            }
+          } catch {
+            // ignore parse errors, keep default
+          }
+          setMusicDbId(musicItem.id as string);
+        }
+      } catch (err) {
+        console.error("Failed to load world data:", err);
+      } finally {
+        setLoaded(true);
+      }
+    }
+    loadData();
+  }, []);
+
+  // Save notes to DB
+  const saveNotes = useCallback(async () => {
+    setNotesSaving(true);
+    setNotesSaved(false);
+    try {
+      // Delete old entry if exists
+      if (notesDbId) {
+        await deleteScratch(notesDbId);
+      }
+      // Save new
+      const result = await saveScratch(MARKER_NOTES + memoContent);
+      if (result) {
+        setNotesDbId(result.id);
+      }
+      setNotesSaved(true);
+      setTimeout(() => setNotesSaved(false), 2000);
+    } catch (err) {
+      console.error("Failed to save notes:", err);
+    } finally {
+      setNotesSaving(false);
+    }
+  }, [memoContent, notesDbId]);
+
+  // Save music list to DB
+  const saveMusic = useCallback(async () => {
+    setMusicSaving(true);
+    setMusicSaved(false);
+    try {
+      // Delete old entry if exists
+      if (musicDbId) {
+        await deleteScratch(musicDbId);
+      }
+      // Save new
+      const result = await saveScratch(MARKER_MUSIC + JSON.stringify(musicList));
+      if (result) {
+        setMusicDbId(result.id);
+      }
+      setMusicSaved(true);
+      setTimeout(() => setMusicSaved(false), 2000);
+    } catch (err) {
+      console.error("Failed to save music:", err);
+    } finally {
+      setMusicSaving(false);
+    }
+  }, [musicList, musicDbId]);
+
   const addMusic = () => {
     if (!newTitle.trim()) return;
-    setMusicList([
+    const updated = [
       ...musicList,
       {
         id: String(Date.now()),
@@ -104,11 +202,16 @@ export default function WorldPage() {
         url: newUrl.trim(),
         note: newNote.trim(),
       },
-    ]);
+    ];
+    setMusicList(updated);
     setNewTitle("");
     setNewArtist("");
     setNewUrl("");
     setNewNote("");
+  };
+
+  const removeMusic = (id: string) => {
+    setMusicList(musicList.filter((m) => m.id !== id));
   };
 
   return (
@@ -156,9 +259,27 @@ export default function WorldPage() {
 
         <TabsContent value="music">
           <div className="space-y-3 mb-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              행안부장관 사운드트랙 후보들
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-muted-foreground">
+                다정의 사운드트랙 후보들
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={saveMusic}
+                disabled={musicSaving}
+                className="gap-1.5"
+              >
+                {musicSaving ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : musicSaved ? (
+                  <Check className="w-3.5 h-3.5 text-green-500" />
+                ) : (
+                  <Save className="w-3.5 h-3.5" />
+                )}
+                {musicSaving ? "저장 중..." : musicSaved ? "저장됨" : "저장"}
+              </Button>
+            </div>
 
             {musicList.map((item) => (
               <Card key={item.id} className="group">
@@ -194,7 +315,7 @@ export default function WorldPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setMusicList(musicList.filter((m) => m.id !== item.id))}
+                      onClick={() => removeMusic(item.id)}
                       className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -246,7 +367,25 @@ export default function WorldPage() {
         <TabsContent value="notes">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">세계관 메모</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium">세계관 메모</CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={saveNotes}
+                  disabled={notesSaving}
+                  className="gap-1.5"
+                >
+                  {notesSaving ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : notesSaved ? (
+                    <Check className="w-3.5 h-3.5 text-green-500" />
+                  ) : (
+                    <Save className="w-3.5 h-3.5" />
+                  )}
+                  {notesSaving ? "저장 중..." : notesSaved ? "저장됨" : "저장"}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <Textarea

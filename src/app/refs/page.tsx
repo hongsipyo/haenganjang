@@ -4,9 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { BookOpen, Plus, Search, Database } from "lucide-react";
+import { useState, useEffect } from "react";
 import { REFS } from "@/lib/data";
+import type { RefData } from "@/lib/data";
+import { getScratchItems } from "@/lib/supabase/actions";
 
 const typeColors: Record<string, string> = {
   소설: "bg-emerald-500/20 text-emerald-300",
@@ -17,9 +19,55 @@ const typeColors: Record<string, string> = {
   기타: "bg-gray-500/20 text-gray-300",
 };
 
+interface DisplayRef extends RefData {
+  fromDb?: boolean;
+}
+
 export default function RefsPage() {
   const [search, setSearch] = useState("");
-  const filtered = REFS.filter(
+  const [allRefs, setAllRefs] = useState<DisplayRef[]>(
+    REFS.map((r) => ({ ...r, fromDb: false }))
+  );
+
+  useEffect(() => {
+    async function loadDbRefs() {
+      try {
+        const scratchItems = await getScratchItems();
+        // Filter scratch items that start with [ref] marker
+        const refItems = scratchItems.filter((item) => {
+          const content = (item.content as string) ?? "";
+          return content.startsWith("[ref]");
+        });
+
+        const dbRefs: DisplayRef[] = refItems.map((item) => {
+          const raw = ((item.content as string) ?? "").replace(/^\[ref\]\s*/, "");
+          // Parse format: "type|title|note|tag1,tag2"
+          const parts = raw.split("|");
+          return {
+            id: (item.id as string) ?? crypto.randomUUID(),
+            type: parts[0]?.trim() || "기타",
+            title: parts[1]?.trim() || raw,
+            note: parts[2]?.trim() || "",
+            tags: parts[3] ? parts[3].split(",").map((t) => t.trim()) : [],
+            fromDb: true,
+          };
+        });
+
+        // Merge: hardcoded first, then DB refs (avoid duplicates by title)
+        const hardcodedTitles = new Set(REFS.map((r) => r.title));
+        const newDbRefs = dbRefs.filter((r) => !hardcodedTitles.has(r.title));
+        setAllRefs([
+          ...REFS.map((r) => ({ ...r, fromDb: false })),
+          ...newDbRefs,
+        ]);
+      } catch {
+        // DB unavailable — keep hardcoded only
+      }
+    }
+    loadDbRefs();
+  }, []);
+
+  const filtered = allRefs.filter(
     (r) =>
       r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.note?.toLowerCase().includes(search.toLowerCase())
@@ -63,6 +111,9 @@ export default function RefsPage() {
                       {ref.type}
                     </span>
                     <h3 className="text-sm font-medium">{ref.title}</h3>
+                    {ref.fromDb && (
+                      <Database className="w-3 h-3 text-muted-foreground" />
+                    )}
                   </div>
                   {ref.note && (
                     <p className="text-xs text-muted-foreground leading-relaxed">
