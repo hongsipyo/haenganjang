@@ -16,7 +16,7 @@ import {
   CHARACTER_Q_CATEGORIES,
   SCENE_PROMPTS,
 } from "@/lib/data";
-import { saveBrainstorm, getBrainstormHistory, saveCharacterField } from "@/lib/supabase/actions";
+import { saveBrainstorm, getBrainstormHistory, saveCharacterField, getCharacterOverrides } from "@/lib/supabase/actions";
 import { Input } from "@/components/ui/input";
 
 // Tension color mapping
@@ -64,6 +64,20 @@ export default function CharacterDetailPage() {
   const [description, setDescription] = useState(char?.description ?? "");
   const [editingProfile, setEditingProfile] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
+
+  // DB에서 저장된 캐릭터 데이터 로드
+  useEffect(() => {
+    if (!char) return;
+    getCharacterOverrides().then((overrides) => {
+      const saved = overrides[char.name];
+      if (saved) {
+        if (saved.notes) setNotes(saved.notes as string);
+        if (saved.element) setElement(saved.element as string);
+        if (saved.animal) setAnimal(saved.animal as string);
+        if (saved.description) setDescription(saved.description as string);
+      }
+    }).catch(() => {});
+  }, [char]);
 
   const handleSaveProfile = async () => {
     if (!char) return;
