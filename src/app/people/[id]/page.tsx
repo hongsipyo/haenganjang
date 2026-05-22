@@ -704,7 +704,12 @@ export default function CharacterDetailPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setEditing(!editing)}
+              onClick={async () => {
+                if (editing && char) {
+                  await saveCharacterField(char.name, "notes", notes || null);
+                }
+                setEditing(!editing);
+              }}
               className="gap-1.5 text-rose-500 hover:text-rose-700"
             >
               {editing ? (
