@@ -27,9 +27,9 @@ import {
 } from "@/lib/supabase/actions";
 
 const difficultyColor = {
-  easy: "bg-emerald-100 text-emerald-700",
-  medium: "bg-amber-100 text-amber-700",
-  hard: "bg-rose-100 text-rose-700",
+  easy: "bg-secondary/50 text-foreground/80",
+  medium: "bg-primary/10 text-primary",
+  hard: "bg-primary/10 text-primary",
 };
 
 const difficultyLabel = { easy: "쉬움", medium: "보통", hard: "도전" };
@@ -136,11 +136,11 @@ export default function ScenesPage() {
 
       {/* Writing panel */}
       {writing && (
-        <Card className="mb-8 border-primary/20 shadow-md shadow-rose-100/30">
+        <Card className="mb-8 border-primary/20 shadow-md shadow-primary/20">
           <CardContent className="p-6 space-y-4">
             {writing !== "new" && (
-              <div className="p-3 rounded-lg bg-amber-50 border border-amber-200/60">
-                <p className="text-sm text-amber-800">
+              <div className="p-3 rounded-lg bg-primary/10 border border-primary/25">
+                <p className="text-sm text-primary">
                   {SCENE_PROMPTS.find((sp) => sp.id === writing)?.prompt}
                 </p>
               </div>
@@ -214,7 +214,7 @@ export default function ScenesPage() {
                           </Badge>
                         )}
                         {done && (
-                          <Badge className="text-[10px] px-1.5 py-0 bg-emerald-100 text-emerald-700">
+                          <Badge className="text-[10px] px-1.5 py-0 bg-secondary/50 text-foreground/80">
                             완료
                           </Badge>
                         )}
@@ -224,7 +224,7 @@ export default function ScenesPage() {
                       </p>
                       <div className="flex gap-1.5">
                         {chars.map((name) => (
-                          <span key={name} className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-600">
+                          <span key={name} className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
                             {name}
                           </span>
                         ))}
@@ -328,17 +328,17 @@ export default function ScenesPage() {
               {(scenesByEpisode.get(null) || []).length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="secondary" className="text-xs bg-gray-100">
+                    <Badge variant="secondary" className="text-xs bg-secondary/40">
                       미배치
                     </Badge>
                     <span className="text-sm text-muted-foreground">
                       {(scenesByEpisode.get(null) || []).length}개 장면
                     </span>
                   </div>
-                  <div className="space-y-2 ml-4 border-l-2 border-dashed border-gray-200 pl-4">
+                  <div className="space-y-2 ml-4 border-l-2 border-dashed border-border pl-4">
                     {(scenesByEpisode.get(null) || []).map((scene) => (
                       <div key={scene.id} className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0 text-[10px] text-gray-400">
+                        <div className="w-6 h-6 rounded-full bg-secondary/40 flex items-center justify-center shrink-0 text-[10px] text-muted-foreground">
                           ?
                         </div>
                         <div>

@@ -162,9 +162,12 @@ export default function WorldPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
-      <div className="flex items-center gap-3 mb-8">
-        <Globe className="w-5 h-5 text-primary" />
-        <h1 className="font-serif text-2xl font-bold">세계관</h1>
+      <div className="mb-8 animate-float-up">
+        <div className="flex items-center gap-2 text-accent">
+          <Globe className="w-4 h-4" />
+          <span className="text-xs font-bold uppercase tracking-[0.2em]">World</span>
+        </div>
+        <h1 className="mt-1 font-serif text-4xl font-black text-neon">세계관</h1>
       </div>
 
       <Tabs defaultValue="moodboard">
@@ -219,7 +222,7 @@ export default function WorldPage() {
                 {musicSaving ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : musicSaved ? (
-                  <Check className="w-3.5 h-3.5 text-green-500" />
+                  <Check className="w-3.5 h-3.5 text-foreground/80" />
                 ) : (
                   <Save className="w-3.5 h-3.5" />
                 )}
@@ -325,7 +328,7 @@ export default function WorldPage() {
                   {notesSaving ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   ) : notesSaved ? (
-                    <Check className="w-3.5 h-3.5 text-green-500" />
+                    <Check className="w-3.5 h-3.5 text-foreground/80" />
                   ) : (
                     <Save className="w-3.5 h-3.5" />
                   )}

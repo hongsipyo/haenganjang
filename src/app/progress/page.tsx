@@ -14,13 +14,13 @@ interface DayStat {
 }
 
 const SECTION_COLORS: Record<string, string> = {
-  fragments: "bg-amber-400",
-  brainstorm: "bg-pink-400",
-  scratch: "bg-yellow-400",
-  episodes: "bg-rose-400",
-  people: "bg-orange-300",
-  world: "bg-amber-300",
-  refs: "bg-pink-300",
+  fragments: "bg-primary",
+  brainstorm: "bg-primary",
+  scratch: "bg-primary",
+  episodes: "bg-primary",
+  people: "bg-primary/20",
+  world: "bg-primary/20",
+  refs: "bg-primary/20",
 };
 
 const SECTION_LABELS: Record<string, string> = {
@@ -43,11 +43,11 @@ function formatTime(iso: string) {
 }
 
 function getHeatColor(count: number) {
-  if (count === 0) return "bg-gray-100";
-  if (count <= 2) return "bg-amber-200";
-  if (count <= 5) return "bg-amber-300";
-  if (count <= 10) return "bg-pink-300";
-  return "bg-pink-400";
+  if (count === 0) return "bg-secondary/40";
+  if (count <= 2) return "bg-primary/20";
+  if (count <= 5) return "bg-primary/20";
+  if (count <= 10) return "bg-primary/20";
+  return "bg-primary";
 }
 
 function calculateStreak(stats: DayStat[]): number {
@@ -158,38 +158,38 @@ export default function ProgressPage() {
       {/* Streak + Today */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Streak Card */}
-        <div className="rounded-2xl border border-pink-200 bg-gradient-to-br from-pink-50 to-amber-50 p-5">
-          <div className="text-xs font-medium text-pink-400 uppercase tracking-wider">
+        <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/20 to-accent/15 p-5">
+          <div className="text-xs font-medium text-accent uppercase tracking-wider">
             스트릭
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-pink-500">{streak}</span>
-            <span className="text-sm text-pink-400">일</span>
+            <span className="text-4xl font-bold text-primary">{streak}</span>
+            <span className="text-sm text-accent">일</span>
           </div>
-          <p className="mt-2 text-sm text-pink-600/80 italic">{streakMsg}</p>
+          <p className="mt-2 text-sm text-primary italic">{streakMsg}</p>
         </div>
 
         {/* Today Card */}
-        <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5">
-          <div className="text-xs font-medium text-amber-500 uppercase tracking-wider">
+        <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/20 to-accent/15 p-5">
+          <div className="text-xs font-medium text-primary uppercase tracking-wider">
             오늘의 활동
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-amber-600">
+            <span className="text-4xl font-bold text-primary">
               {todayActivities.length}
             </span>
-            <span className="text-sm text-amber-500">건</span>
+            <span className="text-sm text-primary">건</span>
           </div>
           {todayActivities.length > 0 && (
             <div className="mt-2 space-y-1">
               {todayActivities.slice(0, 3).map((a) => (
-                <p key={a.id} className="text-xs text-amber-700 truncate">
+                <p key={a.id} className="text-xs text-primary truncate">
                   {SECTION_LABELS[a.section] ?? a.section} &middot;{" "}
                   {a.detail?.slice(0, 30)}
                 </p>
               ))}
               {todayActivities.length > 3 && (
-                <p className="text-xs text-amber-400">
+                <p className="text-xs text-accent">
                   +{todayActivities.length - 3}건 더
                 </p>
               )}
@@ -199,7 +199,7 @@ export default function ProgressPage() {
       </div>
 
       {/* Heatmap Calendar */}
-      <div className="rounded-2xl border border-border/50 bg-white p-5">
+      <div className="rounded-2xl border border-border/50 bg-card/80 p-5">
         <h2 className="text-sm font-semibold text-foreground mb-4">
           주간 캘린더 히트맵
           <span className="ml-2 text-xs font-normal text-muted-foreground">
@@ -216,7 +216,7 @@ export default function ProgressPage() {
                 title={`${day.date}: ${day.count}건`}
               >
                 {day.count > 0 && (
-                  <span className="text-[10px] font-medium text-white/90">
+                  <span className="text-[10px] font-medium text-foreground">
                     {day.count}
                   </span>
                 )}
@@ -230,17 +230,17 @@ export default function ProgressPage() {
         {/* Legend */}
         <div className="flex items-center gap-2 mt-4 text-[10px] text-muted-foreground">
           <span>적음</span>
-          <div className="w-4 h-4 rounded bg-gray-100" />
-          <div className="w-4 h-4 rounded bg-amber-200" />
-          <div className="w-4 h-4 rounded bg-amber-300" />
-          <div className="w-4 h-4 rounded bg-pink-300" />
-          <div className="w-4 h-4 rounded bg-pink-400" />
+          <div className="w-4 h-4 rounded bg-secondary/40" />
+          <div className="w-4 h-4 rounded bg-primary/20" />
+          <div className="w-4 h-4 rounded bg-primary/20" />
+          <div className="w-4 h-4 rounded bg-primary/20" />
+          <div className="w-4 h-4 rounded bg-primary" />
           <span>많음</span>
         </div>
       </div>
 
       {/* Section Stats */}
-      <div className="rounded-2xl border border-border/50 bg-white p-5">
+      <div className="rounded-2xl border border-border/50 bg-card/80 p-5">
         <h2 className="text-sm font-semibold text-foreground mb-4">
           섹션별 통계
         </h2>
@@ -262,10 +262,10 @@ export default function ProgressPage() {
                       {count}건
                     </span>
                   </div>
-                  <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
+                  <div className="h-3 rounded-full bg-secondary/40 overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
-                        SECTION_COLORS[section] ?? "bg-amber-300"
+                        SECTION_COLORS[section] ?? "bg-primary/20"
                       } transition-all duration-500`}
                       style={{
                         width: `${(count / maxSectionCount) * 100}%`,
@@ -279,7 +279,7 @@ export default function ProgressPage() {
       </div>
 
       {/* Activity Feed */}
-      <div className="rounded-2xl border border-border/50 bg-white p-5">
+      <div className="rounded-2xl border border-border/50 bg-card/80 p-5">
         <h2 className="text-sm font-semibold text-foreground mb-4">
           최근 활동 피드
         </h2>
@@ -296,7 +296,7 @@ export default function ProgressPage() {
               >
                 <div
                   className={`mt-1 w-2 h-2 rounded-full shrink-0 ${
-                    SECTION_COLORS[a.section] ?? "bg-gray-300"
+                    SECTION_COLORS[a.section] ?? "bg-card"
                   }`}
                 />
                 <div className="flex-1 min-w-0">

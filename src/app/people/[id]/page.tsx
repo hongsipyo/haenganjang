@@ -21,12 +21,12 @@ import { Input } from "@/components/ui/input";
 
 // Tension color mapping
 const TENSION_COLORS: Record<string, string> = {
-  love: "bg-pink-100 text-pink-700 border-pink-200",
-  family: "bg-amber-100 text-amber-700 border-amber-200",
-  friend: "bg-green-100 text-green-700 border-green-200",
-  conflict: "bg-red-100 text-red-700 border-red-200",
-  mentor: "bg-blue-100 text-blue-700 border-blue-200",
-  loss: "bg-gray-200 text-gray-600 border-gray-300",
+  love: "bg-primary/10 text-primary border-primary/25",
+  family: "bg-primary/10 text-primary border-primary/25",
+  friend: "bg-secondary/50 text-foreground/80 border-border",
+  conflict: "bg-primary/10 text-primary border-primary/25",
+  mentor: "bg-secondary/50 text-foreground/80 border-border",
+  loss: "bg-secondary/40 text-foreground/80 border-border",
 };
 
 const TENSION_LABELS: Record<string, string> = {
@@ -39,9 +39,9 @@ const TENSION_LABELS: Record<string, string> = {
 };
 
 const DIFFICULTY_BADGE: Record<string, string> = {
-  easy: "bg-green-100 text-green-700",
-  medium: "bg-yellow-100 text-yellow-700",
-  hard: "bg-red-100 text-red-700",
+  easy: "bg-secondary/50 text-foreground/80",
+  medium: "bg-primary/10 text-primary",
+  hard: "bg-primary/10 text-primary",
 };
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -196,12 +196,12 @@ export default function CharacterDetailPage() {
       <div className="max-w-3xl mx-auto px-6 py-10">
         <Link
           href="/people"
-          className="inline-flex items-center gap-1.5 text-sm text-rose-400 hover:text-rose-600 mb-6"
+          className="inline-flex items-center gap-1.5 text-sm text-accent hover:text-primary mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           인물 목록
         </Link>
-        <p className="text-gray-500">인물을 찾을 수 없습니다.</p>
+        <p className="text-muted-foreground">인물을 찾을 수 없습니다.</p>
       </div>
     );
   }
@@ -300,10 +300,10 @@ export default function CharacterDetailPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10 bg-gradient-to-b from-rose-50/50 via-white to-amber-50/30 min-h-screen">
+    <div className="max-w-3xl mx-auto px-6 py-10 bg-gradient-to-b from-primary/20 via-white to-accent/15 min-h-screen">
       <Link
         href="/people"
-        className="inline-flex items-center gap-1.5 text-sm text-rose-400 hover:text-rose-600 mb-6"
+        className="inline-flex items-center gap-1.5 text-sm text-accent hover:text-primary mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         인물 목록
@@ -311,8 +311,8 @@ export default function CharacterDetailPage() {
 
       {/* ─── 1. Header ─── */}
       <div className="flex items-start gap-6 mb-8">
-        <div className="w-28 h-36 bg-gradient-to-b from-rose-100 to-amber-50 rounded-lg flex items-center justify-center shrink-0 border border-rose-200">
-          <span className="font-serif text-5xl text-rose-300">
+        <div className="w-28 h-36 bg-gradient-to-b from-primary/20 to-accent/15 rounded-lg flex items-center justify-center shrink-0 border border-primary/25">
+          <span className="font-serif text-5xl text-accent">
             {charName[0] || "?"}
           </span>
         </div>
@@ -325,14 +325,14 @@ export default function CharacterDetailPage() {
                 className="font-serif text-2xl font-bold h-10 w-48"
               />
             ) : (
-              <h1 className="font-serif text-2xl font-bold text-gray-800">
+              <h1 className="font-serif text-2xl font-bold text-foreground/80">
                 {charName}
               </h1>
             )}
             {editingProfile ? (
               <>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-gray-400">오행</span>
+                  <span className="text-[10px] text-muted-foreground">오행</span>
                   <Input
                     value={element}
                     onChange={(e) => setElement(e.target.value)}
@@ -341,7 +341,7 @@ export default function CharacterDetailPage() {
                   />
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-gray-400">동물</span>
+                  <span className="text-[10px] text-muted-foreground">동물</span>
                   <Input
                     value={animal}
                     onChange={(e) => setAnimal(e.target.value)}
@@ -353,17 +353,17 @@ export default function CharacterDetailPage() {
             ) : (
               <>
                 {element && (
-                  <Badge className="bg-amber-100 text-amber-700 border-amber-200 cursor-pointer" onClick={() => setEditingProfile(true)}>
+                  <Badge className="bg-primary/10 text-primary border-primary/25 cursor-pointer" onClick={() => setEditingProfile(true)}>
                     {element}
                   </Badge>
                 )}
                 {animal && (
-                  <Badge className="bg-pink-100 text-pink-700 border-pink-200 cursor-pointer" onClick={() => setEditingProfile(true)}>
+                  <Badge className="bg-primary/10 text-primary border-primary/25 cursor-pointer" onClick={() => setEditingProfile(true)}>
                     {animal}
                   </Badge>
                 )}
                 {!element && !animal && (
-                  <button onClick={() => setEditingProfile(true)} className="text-[10px] text-rose-300 hover:text-rose-500 border border-dashed border-rose-200 rounded-full px-2 py-0.5">
+                  <button onClick={() => setEditingProfile(true)} className="text-[10px] text-accent hover:text-primary border border-dashed border-primary/25 rounded-full px-2 py-0.5">
                     + 오행/동물 설정
                   </button>
                 )}
@@ -378,7 +378,7 @@ export default function CharacterDetailPage() {
               className="text-sm mb-3 min-h-[60px]"
             />
           ) : (
-            <p className="text-gray-500 mb-3 cursor-pointer hover:text-gray-700" onClick={() => setEditingProfile(true)}>
+            <p className="text-muted-foreground mb-3 cursor-pointer hover:text-foreground/80" onClick={() => setEditingProfile(true)}>
               {description || "설명을 추가하세요..."}
             </p>
           )}
@@ -399,15 +399,15 @@ export default function CharacterDetailPage() {
                 취소
               </Button>
             )}
-            <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 rounded-full px-3 py-1 text-sm">
-              <BookOpen className="w-3.5 h-3.5 text-rose-400" />
-              <span className="text-rose-600 font-medium">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/25 rounded-full px-3 py-1 text-sm">
+              <BookOpen className="w-3.5 h-3.5 text-accent" />
+              <span className="text-primary font-medium">
                 {answeredCount}/{totalQuestions} 답변 완료
               </span>
               {!loadingHistory && (
-                <div className="w-16 h-1.5 bg-rose-100 rounded-full overflow-hidden">
+                <div className="w-16 h-1.5 bg-primary/10 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-rose-400 rounded-full transition-all"
+                    className="h-full bg-primary rounded-full transition-all"
                     style={{
                       width: `${totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0}%`,
                     }}
@@ -416,7 +416,7 @@ export default function CharacterDetailPage() {
               )}
             </div>
             {!editingProfile && (
-              <button onClick={() => setEditingProfile(true)} className="text-[10px] text-rose-300 hover:text-rose-500">
+              <button onClick={() => setEditingProfile(true)} className="text-[10px] text-accent hover:text-primary">
                 <Edit2 className="w-3 h-3 inline mr-0.5" />
                 편집
               </button>
@@ -425,35 +425,35 @@ export default function CharacterDetailPage() {
         </div>
       </div>
 
-      <Separator className="mb-8 bg-rose-100" />
+      <Separator className="mb-8 bg-primary/10" />
 
       {/* ─── 2. 기본 정보 + 관계 ─── */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <Card className="border-rose-100 bg-white shadow-sm">
+        <Card className="border-primary/25 bg-card/80 shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">
+            <CardTitle className="text-sm font-medium text-foreground/80">
               기본 정보
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2.5">
             {Object.entries(char.details).map(([key, val]) => (
               <div key={key} className="flex gap-3 text-sm">
-                <span className="text-gray-400 w-20 shrink-0">{key}</span>
-                <span className="text-gray-700">{val}</span>
+                <span className="text-muted-foreground w-20 shrink-0">{key}</span>
+                <span className="text-foreground/80">{val}</span>
               </div>
             ))}
           </CardContent>
         </Card>
 
-        <Card className="border-amber-100 bg-white shadow-sm">
+        <Card className="border-primary/25 bg-card/80 shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">
+            <CardTitle className="text-sm font-medium text-foreground/80">
               관계
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {char.relationships.map((rel, i) => (
-              <p key={i} className="text-sm text-gray-600">
+              <p key={i} className="text-sm text-foreground/80">
                 {rel}
               </p>
             ))}
@@ -463,9 +463,9 @@ export default function CharacterDetailPage() {
 
       {/* ─── 3. 핵심 대사 ─── */}
       {char.keyLines.length > 0 && (
-        <Card className="mb-8 border-pink-100 bg-white shadow-sm">
+        <Card className="mb-8 border-primary/25 bg-card/80 shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">
+            <CardTitle className="text-sm font-medium text-foreground/80">
               핵심 대사
             </CardTitle>
           </CardHeader>
@@ -473,7 +473,7 @@ export default function CharacterDetailPage() {
             {char.keyLines.map((line, i) => (
               <p
                 key={i}
-                className="text-sm text-gray-600 italic border-l-2 border-rose-200 pl-3"
+                className="text-sm text-foreground/80 italic border-l-2 border-primary/25 pl-3"
               >
                 &ldquo;{line}&rdquo;
               </p>
@@ -486,14 +486,14 @@ export default function CharacterDetailPage() {
       {(relationships.length > 0 || customRels.length > 0) && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-serif text-lg font-bold text-gray-800">
+            <h2 className="font-serif text-lg font-bold text-foreground/80">
               관계망
             </h2>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setAddingRel(!addingRel)}
-              className="gap-1 text-rose-500 hover:text-rose-700 border-rose-200"
+              className="gap-1 text-primary hover:text-primary border-primary/25"
             >
               <Plus className="w-3.5 h-3.5" />
               관계 추가
@@ -502,13 +502,13 @@ export default function CharacterDetailPage() {
 
           {/* 새 관계 추가 폼 */}
           {addingRel && (
-            <Card className="border-rose-200 border-dashed bg-rose-50/30 shadow-sm mb-4">
+            <Card className="border-primary/25 border-dashed bg-primary/10 shadow-sm mb-4">
               <CardContent className="pt-4 pb-4 space-y-3">
                 <div className="flex items-center gap-2 flex-wrap">
                   <select
                     value={newRelTo}
                     onChange={(e) => setNewRelTo(e.target.value)}
-                    className="text-sm border border-rose-200 rounded px-2 py-1.5 bg-white"
+                    className="text-sm border border-primary/25 rounded px-2 py-1.5 bg-card/80"
                   >
                     <option value="">상대 인물 선택...</option>
                     {CHARACTERS.filter((c) => c.id !== charId).map((c) => (
@@ -524,7 +524,7 @@ export default function CharacterDetailPage() {
                   <select
                     value={newRelTension}
                     onChange={(e) => setNewRelTension(e.target.value as TensionType)}
-                    className="text-sm border border-rose-200 rounded px-2 py-1.5 bg-white"
+                    className="text-sm border border-primary/25 rounded px-2 py-1.5 bg-card/80"
                   >
                     {Object.entries(TENSION_LABELS).map(([key, label]) => (
                       <option key={key} value={key}>{label}</option>
@@ -538,7 +538,7 @@ export default function CharacterDetailPage() {
                   className="h-8 text-sm"
                 />
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={handleAddRelationship} className="bg-rose-500 hover:bg-rose-600 text-white gap-1">
+                  <Button size="sm" onClick={handleAddRelationship} className="bg-primary hover:bg-primary text-foreground gap-1">
                     <Check className="w-3.5 h-3.5" />
                     추가
                   </Button>
@@ -569,12 +569,12 @@ export default function CharacterDetailPage() {
               return (
                 <Card
                   key={relKey}
-                  className="border-rose-100 bg-white shadow-sm"
+                  className="border-primary/25 bg-card/80 shadow-sm"
                 >
                   <CardContent className="pt-4 pb-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-gray-800">
+                        <span className="font-medium text-foreground/80">
                           {otherChar?.name ?? otherCharId}
                         </span>
 
@@ -606,7 +606,7 @@ export default function CharacterDetailPage() {
                           </span>
                         ) : (
                           <span
-                            className="text-sm text-gray-500 cursor-pointer hover:text-gray-700 hover:underline decoration-dashed"
+                            className="text-sm text-muted-foreground cursor-pointer hover:text-foreground/80 hover:underline decoration-dashed"
                             onClick={() => {
                               setEditingRelLabel(relKey);
                               setTempRelLabel(effectiveLabel);
@@ -633,7 +633,7 @@ export default function CharacterDetailPage() {
                           ))}
                         </select>
 
-                        {isSaving && <span className="text-xs text-gray-400">저장 중...</span>}
+                        {isSaving && <span className="text-xs text-muted-foreground">저장 중...</span>}
                       </div>
                       <Button
                         variant="ghost"
@@ -641,7 +641,7 @@ export default function CharacterDetailPage() {
                         onClick={() =>
                           setOpenRelScene(isOpen ? null : relKey)
                         }
-                        className="text-rose-500 hover:text-rose-700 gap-1"
+                        className="text-primary hover:text-primary gap-1"
                       >
                         <Pen className="w-3.5 h-3.5" />
                         장면 쓰기
@@ -665,7 +665,7 @@ export default function CharacterDetailPage() {
                               setEditingRelPrompt(null);
                             }
                           }}
-                          className="text-xs min-h-[40px] border-amber-200 focus:border-amber-400"
+                          className="text-xs min-h-[40px] border-primary/25 focus:border-primary/25"
                         />
                         <Button
                           variant="ghost"
@@ -675,7 +675,7 @@ export default function CharacterDetailPage() {
                             saveRelOverride(rel.from, rel.to, updated);
                             setEditingRelPrompt(null);
                           }}
-                          className="shrink-0 text-green-600 p-1 h-auto"
+                          className="shrink-0 text-foreground/80 p-1 h-auto"
                         >
                           <Check className="w-3.5 h-3.5" />
                         </Button>
@@ -683,14 +683,14 @@ export default function CharacterDetailPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setEditingRelPrompt(null)}
-                          className="shrink-0 text-gray-400 p-1 h-auto"
+                          className="shrink-0 text-muted-foreground p-1 h-auto"
                         >
                           <X className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                     ) : (
                       <p
-                        className="text-xs text-gray-400 mt-1 cursor-pointer hover:text-gray-600"
+                        className="text-xs text-muted-foreground mt-1 cursor-pointer hover:text-foreground/80"
                         onClick={() => {
                           setEditingRelPrompt(relKey);
                           setTempRelPrompt(effectivePrompt);
@@ -702,19 +702,19 @@ export default function CharacterDetailPage() {
                     )}
 
                     {existingAnswer && !isOpen && (
-                      <p className="text-sm text-green-700 bg-green-50 rounded p-2 mt-2 whitespace-pre-wrap">
+                      <p className="text-sm text-foreground/80 bg-secondary/50 rounded p-2 mt-2 whitespace-pre-wrap">
                         {existingAnswer}
                       </p>
                     )}
 
                     {isOpen && (
                       <div className="mt-3 space-y-2">
-                        <p className="text-sm text-gray-500 italic bg-amber-50 rounded p-2 border border-amber-100">
+                        <p className="text-sm text-muted-foreground italic bg-primary/10 rounded p-2 border border-primary/25">
                           {effectivePrompt}
                         </p>
                         <Textarea
                           placeholder="여기에 장면을 써보세요..."
-                          className="min-h-[100px] text-sm border-rose-200 focus:border-rose-400"
+                          className="min-h-[100px] text-sm border-primary/25 focus:border-primary/25"
                           value={relSceneText[relKey] ?? existingAnswer ?? ""}
                           onChange={(e) =>
                             setRelSceneText((prev) => ({
@@ -729,7 +729,7 @@ export default function CharacterDetailPage() {
                             handleSaveRelScene(relKey, effectivePrompt)
                           }
                           disabled={savingRel === relKey}
-                          className="bg-rose-500 hover:bg-rose-600 text-white"
+                          className="bg-primary hover:bg-primary text-foreground"
                         >
                           {savingRel === relKey ? "저장 중..." : "저장"}
                         </Button>
@@ -745,7 +745,7 @@ export default function CharacterDetailPage() {
 
       {/* ─── 5. 캐릭터 질문 ─── */}
       <section className="mb-8">
-        <h2 className="font-serif text-lg font-bold text-gray-800 mb-4">
+        <h2 className="font-serif text-lg font-bold text-foreground/80 mb-4">
           캐릭터 질문
         </h2>
         <div className="space-y-3">
@@ -760,7 +760,7 @@ export default function CharacterDetailPage() {
             return (
               <Card
                 key={cat}
-                className="border-amber-100 bg-white shadow-sm"
+                className="border-primary/25 bg-card/80 shadow-sm"
               >
                 <CardHeader
                   className="pb-2 pt-3 cursor-pointer"
@@ -769,16 +769,16 @@ export default function CharacterDetailPage() {
                   }
                 >
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <CardTitle className="text-sm font-medium text-foreground/80 flex items-center gap-2">
                       {catLabel}
-                      <span className="text-xs text-gray-400 font-normal">
+                      <span className="text-xs text-muted-foreground font-normal">
                         {answeredInCat}/{qs.length}
                       </span>
                     </CardTitle>
                     {isExpanded ? (
-                      <ChevronUp className="w-4 h-4 text-gray-400" />
+                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
                     )}
                   </div>
                 </CardHeader>
@@ -794,8 +794,8 @@ export default function CharacterDetailPage() {
                           key={q.id}
                           className={`rounded-lg p-3 border transition-colors ${
                             isAnswered
-                              ? "bg-green-50 border-green-200"
-                              : "bg-rose-50/50 border-rose-100 hover:border-rose-200"
+                              ? "bg-secondary/50 border-border"
+                              : "bg-primary/10 border-primary/25 hover:border-primary/25"
                           }`}
                         >
                           <div
@@ -807,21 +807,21 @@ export default function CharacterDetailPage() {
                             <p
                               className={`text-sm flex-1 ${
                                 isAnswered
-                                  ? "text-green-700"
-                                  : "text-gray-700"
+                                  ? "text-foreground/80"
+                                  : "text-foreground/80"
                               }`}
                             >
                               {q.question}
                             </p>
                             {isAnswered && (
-                              <Badge className="bg-green-100 text-green-600 border-green-200 text-xs ml-2 shrink-0">
+                              <Badge className="bg-secondary/50 text-foreground/80 border-border text-xs ml-2 shrink-0">
                                 완료
                               </Badge>
                             )}
                           </div>
 
                           {isAnswered && !isQOpen && (
-                            <p className="text-sm text-green-700 mt-2 whitespace-pre-wrap">
+                            <p className="text-sm text-foreground/80 mt-2 whitespace-pre-wrap">
                               {answeredMap[q.question]}
                             </p>
                           )}
@@ -830,7 +830,7 @@ export default function CharacterDetailPage() {
                             <div className="mt-3 space-y-2">
                               <Textarea
                                 placeholder="답변을 써보세요..."
-                                className="min-h-[80px] text-sm border-rose-200 focus:border-rose-400"
+                                className="min-h-[80px] text-sm border-primary/25 focus:border-primary/25"
                                 value={
                                   questionAnswers[q.question] ??
                                   answeredMap[q.question] ??
@@ -849,7 +849,7 @@ export default function CharacterDetailPage() {
                                   handleSaveQuestion(q.question)
                                 }
                                 disabled={savingQ === q.question}
-                                className="bg-rose-500 hover:bg-rose-600 text-white"
+                                className="bg-primary hover:bg-primary text-foreground"
                               >
                                 {savingQ === q.question
                                   ? "저장 중..."
@@ -871,7 +871,7 @@ export default function CharacterDetailPage() {
       {/* ─── 6. 이 인물이 등장하는 장면 ─── */}
       {characterScenes.length > 0 && (
         <section className="mb-8">
-          <h2 className="font-serif text-lg font-bold text-gray-800 mb-4">
+          <h2 className="font-serif text-lg font-bold text-foreground/80 mb-4">
             이 인물이 등장하는 장면
           </h2>
           <div className="space-y-4">
@@ -882,12 +882,12 @@ export default function CharacterDetailPage() {
               return (
                 <Card
                   key={sp.id}
-                  className="border-amber-100 bg-white shadow-sm"
+                  className="border-primary/25 bg-card/80 shadow-sm"
                 >
                   <CardContent className="pt-4 pb-4">
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-gray-800 text-sm">
+                        <span className="font-medium text-foreground/80 text-sm">
                           {sp.title}
                         </span>
                         <Badge
@@ -896,7 +896,7 @@ export default function CharacterDetailPage() {
                           {DIFFICULTY_LABELS[sp.difficulty]}
                         </Badge>
                         {sp.episode && (
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-muted-foreground">
                             {sp.episode}화
                           </span>
                         )}
@@ -907,7 +907,7 @@ export default function CharacterDetailPage() {
                         onClick={() =>
                           setOpenScene(isSceneOpen ? null : sp.id)
                         }
-                        className="text-amber-600 hover:text-amber-800 gap-1"
+                        className="text-primary hover:text-primary gap-1"
                       >
                         <Pen className="w-3.5 h-3.5" />
                         써보기
@@ -915,19 +915,19 @@ export default function CharacterDetailPage() {
                     </div>
 
                     {existingAnswer && !isSceneOpen && (
-                      <p className="text-sm text-green-700 bg-green-50 rounded p-2 mt-2 whitespace-pre-wrap">
+                      <p className="text-sm text-foreground/80 bg-secondary/50 rounded p-2 mt-2 whitespace-pre-wrap">
                         {existingAnswer}
                       </p>
                     )}
 
                     {isSceneOpen && (
                       <div className="mt-3 space-y-2">
-                        <p className="text-sm text-gray-500 italic bg-amber-50 rounded p-2 border border-amber-100">
+                        <p className="text-sm text-muted-foreground italic bg-primary/10 rounded p-2 border border-primary/25">
                           {sp.prompt}
                         </p>
                         <Textarea
                           placeholder="장면을 써보세요..."
-                          className="min-h-[100px] text-sm border-amber-200 focus:border-amber-400"
+                          className="min-h-[100px] text-sm border-primary/25 focus:border-primary/25"
                           value={
                             sceneText[sp.id] ?? existingAnswer ?? ""
                           }
@@ -944,7 +944,7 @@ export default function CharacterDetailPage() {
                             handleSaveScene(sp.id, sp.prompt)
                           }
                           disabled={savingScene === sp.id}
-                          className="bg-amber-500 hover:bg-amber-600 text-white"
+                          className="bg-primary hover:bg-primary text-foreground"
                         >
                           {savingScene === sp.id ? "저장 중..." : "저장"}
                         </Button>
@@ -959,9 +959,9 @@ export default function CharacterDetailPage() {
       )}
 
       {/* ─── 7. 메모 ─── */}
-      <Card className="border-rose-100 bg-white shadow-sm">
+      <Card className="border-primary/25 bg-card/80 shadow-sm">
         <CardHeader className="pb-3 flex flex-row items-center justify-between">
-          <CardTitle className="text-sm font-medium text-gray-700">
+          <CardTitle className="text-sm font-medium text-foreground/80">
             메모
           </CardTitle>
           <div className="flex gap-2">
@@ -970,7 +970,7 @@ export default function CharacterDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowQuestionPicker((v) => !v)}
-                className="gap-1.5 text-amber-600 hover:text-amber-800 border-amber-200"
+                className="gap-1.5 text-primary hover:text-primary border-primary/25"
               >
                 <Pen className="w-3.5 h-3.5" />
                 {showQuestionPicker ? "접기" : "질문에 반영"}
@@ -985,7 +985,7 @@ export default function CharacterDetailPage() {
                 }
                 setEditing(!editing);
               }}
-              className="gap-1.5 text-rose-500 hover:text-rose-700"
+              className="gap-1.5 text-primary hover:text-primary"
             >
               {editing ? (
                 <>
@@ -1007,21 +1007,21 @@ export default function CharacterDetailPage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="길게 붙여넣으면 캐릭터 질문 답변으로 활용 가능"
-              className="min-h-[120px] text-sm border-rose-200 focus:border-rose-400"
+              className="min-h-[120px] text-sm border-primary/25 focus:border-primary/25"
             />
           ) : (
-            <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
+            <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">
               {notes || "아직 메모가 없습니다. 길게 붙여넣으면 캐릭터 질문 답변으로 활용할 수 있어요."}
             </p>
           )}
 
           {/* 미답변 질문에 반영 패널 */}
           {showQuestionPicker && (
-            <div className="mt-4 border-t border-amber-100 pt-4">
-              <p className="text-xs text-amber-600 mb-3">미답변 질문을 클릭하면 메모 내용이 답변으로 저장됩니다</p>
+            <div className="mt-4 border-t border-primary/25 pt-4">
+              <p className="text-xs text-primary mb-3">미답변 질문을 클릭하면 메모 내용이 답변으로 저장됩니다</p>
               <div className="space-y-2 max-h-[300px] overflow-y-auto">
                 {questions.filter((q) => !answeredMap[q.question]).length === 0 ? (
-                  <p className="text-xs text-gray-400">모든 질문에 답변 완료!</p>
+                  <p className="text-xs text-muted-foreground">모든 질문에 답변 완료!</p>
                 ) : (
                   questions
                     .filter((q) => !answeredMap[q.question])
@@ -1037,11 +1037,11 @@ export default function CharacterDetailPage() {
                           setSavingQ(null);
                         }}
                         disabled={savingQ === q.question}
-                        className="w-full text-left text-sm p-2.5 rounded-lg border border-amber-100 hover:bg-amber-50 hover:border-amber-300 transition-colors disabled:opacity-50"
+                        className="w-full text-left text-sm p-2.5 rounded-lg border border-primary/25 hover:bg-primary/10 hover:border-primary/25 transition-colors disabled:opacity-50"
                       >
-                        <span className="text-xs text-amber-500 mr-1.5">{CHARACTER_Q_CATEGORIES[q.category] ?? q.category}</span>
+                        <span className="text-xs text-primary mr-1.5">{CHARACTER_Q_CATEGORIES[q.category] ?? q.category}</span>
                         {q.question}
-                        {savingQ === q.question && <span className="text-xs text-amber-400 ml-2">저장 중...</span>}
+                        {savingQ === q.question && <span className="text-xs text-accent ml-2">저장 중...</span>}
                       </button>
                     ))
                 )}
@@ -1061,10 +1061,10 @@ export default function CharacterDetailPage() {
             ];
 
             const COLORS: Record<string, { bg: string; border: string; text: string; badge: string }> = {
-              red: { bg: "bg-red-50", border: "border-red-200", text: "text-red-700", badge: "bg-red-100 text-red-600" },
-              purple: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700", badge: "bg-purple-100 text-purple-600" },
-              amber: { bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-700", badge: "bg-amber-100 text-amber-600" },
-              blue: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700", badge: "bg-blue-100 text-blue-600" },
+              red: { bg: "bg-primary/10", border: "border-primary/25", text: "text-primary", badge: "bg-primary/10 text-primary" },
+              purple: { bg: "bg-secondary/50", border: "border-border", text: "text-foreground/80", badge: "bg-secondary/50 text-foreground/80" },
+              amber: { bg: "bg-primary/10", border: "border-primary/25", text: "text-primary", badge: "bg-primary/10 text-primary" },
+              blue: { bg: "bg-secondary/50", border: "border-border", text: "text-foreground/80", badge: "bg-secondary/50 text-foreground/80" },
             };
 
             // 문장 단위로 분리 (줄바꿈, 마침표, - 글머리 기준)
@@ -1104,8 +1104,8 @@ export default function CharacterDetailPage() {
             }
 
             return (
-              <div className="mt-4 border-t border-pink-100 pt-4">
-                <p className="text-xs text-pink-500 font-medium mb-3">떡밥 / 발전 가능 요소 ({results.length}개 추출)</p>
+              <div className="mt-4 border-t border-primary/25 pt-4">
+                <p className="text-xs text-primary font-medium mb-3">떡밥 / 발전 가능 요소 ({results.length}개 추출)</p>
                 <div className="space-y-3">
                   {Array.from(grouped.entries()).map(([cat, items]) => {
                     const c = COLORS[items[0].color];

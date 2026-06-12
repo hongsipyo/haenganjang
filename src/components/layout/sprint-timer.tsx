@@ -70,7 +70,7 @@ export function SprintTimer() {
         className={cn(
           "fixed bottom-6 left-6 z-50",
           "h-12 px-4 rounded-full flex items-center gap-2 shadow-lg transition-all duration-200",
-          "bg-gradient-to-r from-amber-100 to-rose-100 text-amber-700 border border-amber-200/60",
+          "bg-gradient-to-r from-primary/20 to-accent/15 text-primary border border-primary/25",
           "hover:shadow-xl hover:scale-105 active:scale-95"
         )}
       >
@@ -86,8 +86,8 @@ export function SprintTimer() {
       <div
         className={cn(
           "fixed bottom-6 left-6 z-50",
-          "rounded-2xl shadow-xl border border-amber-200/60 px-5 py-3",
-          "bg-gradient-to-r from-amber-50 to-rose-50",
+          "rounded-2xl shadow-xl border border-primary/25 px-5 py-3",
+          "bg-gradient-to-r from-primary/20 to-accent/15",
           "animate-pulse-gentle"
         )}
       >
@@ -101,18 +101,18 @@ export function SprintTimer() {
           }
         `}</style>
         <div className="flex items-center gap-3">
-          <Timer className="w-5 h-5 text-amber-600" />
-          <span className="text-2xl font-semibold text-amber-800 tabular-nums">
+          <Timer className="w-5 h-5 text-primary" />
+          <span className="text-2xl font-semibold text-primary tabular-nums">
             {formatTime(secondsLeft)}
           </span>
           <button
             onClick={stop}
-            className="ml-2 p-1.5 rounded-full hover:bg-rose-100 text-rose-400 transition-colors"
+            className="ml-2 p-1.5 rounded-full hover:bg-primary/10 text-accent transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-[11px] text-amber-500 mt-1">집중 중... 잘 하고 있어!</p>
+        <p className="text-[11px] text-primary mt-1">집중 중... 잘 하고 있어!</p>
       </div>
     );
   }
@@ -123,28 +123,28 @@ export function SprintTimer() {
       <div
         className={cn(
           "fixed bottom-6 left-6 z-50",
-          "rounded-2xl shadow-xl border border-rose-200/60 px-5 py-4",
-          "bg-gradient-to-r from-rose-50 to-amber-50"
+          "rounded-2xl shadow-xl border border-primary/25 px-5 py-4",
+          "bg-gradient-to-r from-primary/20 to-accent/15"
         )}
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">🎉</span>
           <div>
-            <p className="text-sm font-semibold text-rose-700">수고했어!</p>
-            <p className="text-xs text-amber-600">{selectedMinutes}분 집중 완료</p>
+            <p className="text-sm font-semibold text-primary">수고했어!</p>
+            <p className="text-xs text-primary">{selectedMinutes}분 집중 완료</p>
           </div>
         </div>
         <div className="flex gap-2 mt-3">
           <button
             onClick={extend}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
           >
             <RotateCcw className="w-3 h-3" />
             한 번 더
           </button>
           <button
             onClick={() => { stop(); setOpen(false); }}
-            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-rose-100 text-rose-600 hover:bg-rose-200 transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
           >
             완료
           </button>
@@ -158,18 +158,18 @@ export function SprintTimer() {
     <div
       className={cn(
         "fixed bottom-6 left-6 z-50",
-        "rounded-2xl shadow-xl border border-amber-200/60 px-5 py-4",
-        "bg-gradient-to-r from-amber-50 to-rose-50"
+        "rounded-2xl shadow-xl border border-primary/25 px-5 py-4",
+        "bg-gradient-to-r from-primary/20 to-accent/15"
       )}
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Timer className="w-4 h-4 text-amber-600" />
-          <span className="text-sm font-medium text-amber-800">스프린트 타이머</span>
+          <Timer className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium text-primary">스프린트 타이머</span>
         </div>
         <button
           onClick={() => setOpen(false)}
-          className="p-1 rounded-full hover:bg-rose-100 text-rose-400 transition-colors"
+          className="p-1 rounded-full hover:bg-primary/10 text-accent transition-colors"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -182,8 +182,8 @@ export function SprintTimer() {
             className={cn(
               "px-3 py-1.5 text-xs font-medium rounded-lg transition-colors",
               selectedMinutes === opt.minutes
-                ? "bg-amber-200 text-amber-800"
-                : "bg-white/60 text-amber-600 hover:bg-amber-100"
+                ? "bg-primary/20 text-primary"
+                : "bg-card/80 text-primary hover:bg-primary/10"
             )}
           >
             {opt.label}
@@ -192,7 +192,7 @@ export function SprintTimer() {
       </div>
       <button
         onClick={start}
-        className="w-full py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-rose-400 to-amber-400 text-white hover:opacity-90 transition-opacity"
+        className="w-full py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-primary/20 to-accent/15 text-foreground hover:opacity-90 transition-opacity"
       >
         시작!
       </button>

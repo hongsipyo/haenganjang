@@ -20,6 +20,7 @@ import {
   Feather,
   BookText,
   FileText,
+  MessageSquare,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -32,6 +33,7 @@ const navItems = [
   { href: "/fragments", label: "파편", icon: Sparkles, emoji: "" },
   { href: "/brainstorm", label: "브레인스토밍", icon: Lightbulb, emoji: "" },
   { href: "/progress", label: "프로그레스", icon: TrendingUp, emoji: "" },
+  { href: "/community", label: "독자 반응", icon: MessageSquare, emoji: "" },
   { href: "/refs", label: "레퍼런스", icon: BookOpen, emoji: "" },
   { href: "/scratch", label: "메모", icon: StickyNote, emoji: "" },
   { href: "/treatment", label: "트리트먼트", icon: FileText, emoji: "" },
@@ -64,7 +66,7 @@ export function Sidebar() {
       {/* Mobile toggle */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed top-4 left-4 z-50 md:hidden p-2.5 rounded-xl bg-white/80 backdrop-blur border border-border shadow-sm"
+        className="fixed top-4 left-4 z-50 md:hidden p-2.5 rounded-xl glass text-foreground"
       >
         <Menu className="w-5 h-5" />
       </button>
@@ -72,7 +74,7 @@ export function Sidebar() {
       {/* Overlay */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
           onClick={() => setOpen(false)}
         />
       )}
@@ -80,19 +82,20 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed md:sticky top-0 left-0 z-50 h-screen w-60 bg-white/70 backdrop-blur-xl border-r border-border/50 flex flex-col transition-transform duration-200",
+          "fixed md:sticky top-0 left-0 z-50 h-screen w-60 glass border-r border-primary/15 flex flex-col transition-transform duration-200",
           "md:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Header — 작가 홍시표 */}
-        <div className="p-5 border-b border-border/50">
+        <div className="p-5 border-b border-primary/15 relative">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
           <Link href="/home" className="block">
-            <span className="font-serif text-2xl font-bold tracking-tight text-primary">
+            <span className="font-serif text-2xl font-black tracking-tight text-neon">
               행안부장관
             </span>
             <div className="flex items-center gap-1.5 mt-1">
-              <Pen className="w-3 h-3 text-muted-foreground" />
+              <Pen className="w-3 h-3 text-accent" />
               <span className="text-[11px] text-muted-foreground tracking-wide">
                 작가 홍시표
               </span>
@@ -115,8 +118,8 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150",
                   isActive
-                    ? "bg-primary/10 text-primary font-medium shadow-sm"
-                    : "text-foreground/60 hover:text-foreground hover:bg-accent/60"
+                    ? "bg-primary/15 text-primary font-semibold glow-red border border-primary/30"
+                    : "text-foreground/55 hover:text-foreground hover:bg-secondary/70"
                 )}
               >
                 <item.icon className={cn("w-4 h-4 shrink-0", isActive && "text-primary")} />
@@ -127,16 +130,16 @@ export function Sidebar() {
         </nav>
 
         {/* Bottom — 격려 + 검색 */}
-        <div className="p-4 border-t border-border/50 space-y-3">
+        <div className="p-4 border-t border-primary/15 space-y-3">
           {/* Daily encouragement */}
-          <div className="px-3 py-2.5 rounded-xl bg-gradient-to-r from-primary/5 to-accent/30 border border-primary/10">
-            <p className="text-[11px] text-primary/80 italic leading-relaxed">
+          <div className="px-3 py-2.5 rounded-xl bg-gradient-to-r from-primary/15 to-accent/15 border border-primary/20">
+            <p className="text-[11px] text-accent/90 italic leading-relaxed">
               {getDailyEncouragement()}
             </p>
           </div>
           <Link
             href="/search"
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-foreground/50 hover:text-foreground hover:bg-accent/60 transition-colors"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-foreground/50 hover:text-foreground hover:bg-secondary/70 transition-colors"
           >
             <Search className="w-4 h-4" />
             검색

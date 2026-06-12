@@ -48,12 +48,12 @@ function SaveCelebrationOverlay({ message }: { message: string }) {
         </div>
         {/* Message */}
         <div
-          className="relative bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border border-rose-200/50"
+          className="relative bg-card/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border border-primary/25"
           style={{
             animation: "celebrateMessage 1.5s ease-out forwards",
           }}
         >
-          <p className="text-base font-medium text-rose-600 text-center whitespace-nowrap">
+          <p className="text-base font-medium text-primary text-center whitespace-nowrap">
             {message}
           </p>
         </div>

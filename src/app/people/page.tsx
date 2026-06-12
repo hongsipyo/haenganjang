@@ -11,11 +11,11 @@ import { getCharacterOverrides } from "@/lib/supabase/actions";
 
 function getElementColor(element: string | null) {
   if (!element) return "bg-secondary text-secondary-foreground";
-  if (element.includes("水")) return "bg-blue-500/20 text-blue-300";
-  if (element.includes("火")) return "bg-red-500/20 text-red-300";
-  if (element.includes("木")) return "bg-green-500/20 text-green-300";
-  if (element.includes("金")) return "bg-yellow-500/20 text-yellow-300";
-  if (element.includes("土")) return "bg-amber-500/20 text-amber-300";
+  if (element.includes("水")) return "bg-secondary/40 text-foreground/80";
+  if (element.includes("火")) return "bg-primary/20 text-accent";
+  if (element.includes("木")) return "bg-secondary/40 text-foreground/80";
+  if (element.includes("金")) return "bg-primary/20 text-accent";
+  if (element.includes("土")) return "bg-primary/20 text-accent";
   return "bg-secondary text-secondary-foreground";
 }
 
@@ -48,27 +48,32 @@ export default function PeoplePage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <Users className="w-5 h-5 text-primary" />
-          <h1 className="font-serif text-2xl font-bold">인물</h1>
+      <div className="flex items-end justify-between mb-8 animate-float-up">
+        <div>
+          <div className="flex items-center gap-2 text-accent">
+            <Users className="w-4 h-4" />
+            <span className="text-xs font-bold uppercase tracking-[0.2em]">Characters</span>
+          </div>
+          <h1 className="mt-1 font-serif text-4xl font-black text-neon">인물</h1>
+          <p className="mt-1 text-sm text-muted-foreground">권력과 풍자의 한복판을 사는 {characters.length}명</p>
         </div>
-        <Button size="sm" className="gap-1.5">
+        <Button size="sm" className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 glow-red">
           <Plus className="w-4 h-4" />
           새 인물
         </Button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {characters.map((char) => (
-          <Link key={char.id} href={`/people/${char.id}`}>
-            <Card className="group hover:border-primary/30 transition-all hover:-translate-y-0.5 cursor-pointer h-full">
+        {characters.map((char, i) => (
+          <Link key={char.id} href={`/people/${char.id}`} className="animate-float-up" style={{ animationDelay: `${i * 50}ms` }}>
+            <Card className="group hover:border-primary/30 hover:glow-red transition-all duration-300 hover:-translate-y-1.5 cursor-pointer h-full overflow-hidden">
               <CardContent className="p-0">
                 {/* Image placeholder */}
-                <div className="aspect-[3/4] bg-gradient-to-b from-secondary/50 to-card rounded-t-lg flex items-center justify-center">
-                  <span className="font-serif text-4xl text-muted-foreground/30">
+                <div className="aspect-[3/4] relative flex items-center justify-center" style={{ background: "radial-gradient(120% 90% at 50% 15%, hsl(0 80% 40% / 0.35), transparent 60%), linear-gradient(180deg, hsl(220 16% 13%), hsl(220 18% 8%))" }}>
+                  <span className="font-serif text-5xl text-neon opacity-80 transition group-hover:scale-110 group-hover:opacity-100">
                     {char.name[0]}
                   </span>
+                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[hsl(220_18%_8%)] to-transparent" />
                 </div>
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-1.5">

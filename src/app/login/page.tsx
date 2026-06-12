@@ -57,8 +57,8 @@ export default function LoginPage() {
               required
               minLength={6}
             />
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            {info && <p className="text-sm text-green-600">{info}</p>}
+            {error && <p className="text-sm text-primary">{error}</p>}
+            {info && <p className="text-sm text-foreground/80">{info}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading
                 ? "처리 중..."

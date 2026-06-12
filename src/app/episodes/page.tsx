@@ -9,11 +9,11 @@ import { PLOT_BEATS, PLATFORM_PLANS, getOverallProgress } from "@/lib/data";
 import type { PlotBeat } from "@/lib/data";
 
 const ACT_COLORS: Record<PlotBeat["act"], { bg: string; text: string; border: string; dot: string }> = {
-  "발단": { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", dot: "bg-amber-400" },
-  "전개": { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", dot: "bg-blue-400" },
-  "위기": { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200", dot: "bg-rose-400" },
-  "절정": { bg: "bg-red-50", text: "text-red-700", border: "border-red-200", dot: "bg-red-500" },
-  "결말": { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", dot: "bg-emerald-500" },
+  "발단": { bg: "bg-accent/10", text: "text-accent", border: "border-accent/25", dot: "bg-accent" },
+  "전개": { bg: "bg-primary/8", text: "text-foreground/80", border: "border-primary/15", dot: "bg-primary/60" },
+  "위기": { bg: "bg-primary/12", text: "text-primary", border: "border-primary/30", dot: "bg-primary" },
+  "절정": { bg: "bg-primary/18", text: "text-neon", border: "border-primary/40", dot: "bg-primary" },
+  "결말": { bg: "bg-accent/12", text: "text-accent", border: "border-accent/30", dot: "bg-accent" },
 };
 
 const PLATFORM_ICONS = {
@@ -23,9 +23,9 @@ const PLATFORM_ICONS = {
 };
 
 const PLATFORM_COLORS = {
-  "영화": { bg: "bg-violet-50", border: "border-violet-200", text: "text-violet-700", badge: "bg-violet-100 text-violet-700" },
-  "웹툰": { bg: "bg-rose-50", border: "border-rose-200", text: "text-rose-700", badge: "bg-rose-100 text-rose-700" },
-  "웹소설": { bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", badge: "bg-emerald-100 text-emerald-700" },
+  "영화": { bg: "bg-secondary/50", border: "border-border", text: "text-foreground/80", badge: "bg-secondary/50 text-foreground/80" },
+  "웹툰": { bg: "bg-primary/10", border: "border-primary/25", text: "text-primary", badge: "bg-primary/10 text-primary" },
+  "웹소설": { bg: "bg-secondary/50", border: "border-border", text: "text-foreground/80", badge: "bg-secondary/50 text-foreground/80" },
 };
 
 export default function EpisodesPage() {
@@ -34,9 +34,12 @@ export default function EpisodesPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-2">
-        <Film className="w-5 h-5 text-primary" />
-        <h1 className="font-serif text-2xl font-bold">플롯 구조</h1>
+      <div className="mb-2 animate-float-up">
+        <div className="flex items-center gap-2 text-accent">
+          <Film className="w-4 h-4" />
+          <span className="text-xs font-bold uppercase tracking-[0.2em]">Plot</span>
+        </div>
+        <h1 className="mt-1 font-serif text-4xl font-black text-neon">플롯 구조</h1>
       </div>
       <div className="flex items-center gap-3 mb-10">
         <Progress value={totalProgress} className="h-1.5 flex-1 max-w-xs" />
@@ -45,7 +48,7 @@ export default function EpisodesPage() {
 
       {/* ── 5막 타임라인 ── */}
       <section className="mb-16">
-        <h2 className="text-sm font-medium text-amber-700/80 uppercase tracking-wider mb-6">
+        <h2 className="text-sm font-medium text-primary uppercase tracking-wider mb-6">
           5막 타임라인
         </h2>
         <div className="relative">
@@ -58,7 +61,7 @@ export default function EpisodesPage() {
               return (
                 <div key={beat.id} className="relative pl-12">
                   {/* Dot on timeline */}
-                  <div className={`absolute left-2.5 top-5 w-3 h-3 rounded-full ${colors.dot} ring-2 ring-white`} />
+                  <div className={`absolute left-2.5 top-5 w-3 h-3 rounded-full ${colors.dot} ring-2 ring-background`} />
 
                   <Card className={`${colors.bg} ${colors.border} border shadow-sm hover:shadow-md transition-shadow`}>
                     <CardContent className="p-5">
@@ -76,7 +79,7 @@ export default function EpisodesPage() {
                       <h3 className={`font-medium text-base mb-1.5 ${colors.text}`}>
                         {beat.title}
                       </h3>
-                      <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                      <p className="text-sm text-foreground/80 leading-relaxed mb-3">
                         {beat.description}
                       </p>
 
@@ -84,11 +87,11 @@ export default function EpisodesPage() {
                       {beat.scenes.length > 0 && (
                         <div className="space-y-1.5 mb-3">
                           {beat.scenes.map((scene, j) => (
-                            <div key={j} className="flex items-start gap-2 text-xs text-gray-500">
+                            <div key={j} className="flex items-start gap-2 text-xs text-muted-foreground">
                               <span className="text-muted-foreground/40 mt-0.5 shrink-0">S{j + 1}</span>
                               <div>
-                                <span className="font-medium text-gray-600">{scene.title}</span>
-                                <span className="text-gray-400 mx-1">--</span>
+                                <span className="font-medium text-foreground/80">{scene.title}</span>
+                                <span className="text-muted-foreground mx-1">--</span>
                                 <span>{scene.content}</span>
                               </div>
                             </div>
@@ -113,7 +116,7 @@ export default function EpisodesPage() {
 
       {/* ── 플랫폼별 계획 ── */}
       <section>
-        <h2 className="text-sm font-medium text-amber-700/80 uppercase tracking-wider mb-6">
+        <h2 className="text-sm font-medium text-primary uppercase tracking-wider mb-6">
           플랫폼별 계획
         </h2>
         <div className="grid md:grid-cols-3 gap-4">
@@ -130,10 +133,10 @@ export default function EpisodesPage() {
                       {plan.totalLength}
                     </Badge>
                   </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
+                  <p className="text-xs text-foreground/80 leading-relaxed">
                     {plan.pacing}
                   </p>
-                  <p className="text-xs text-gray-500 italic leading-relaxed">
+                  <p className="text-xs text-muted-foreground italic leading-relaxed">
                     {plan.notes}
                   </p>
                 </CardContent>

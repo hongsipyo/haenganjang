@@ -11,12 +11,12 @@ import type { RefData } from "@/lib/data";
 import { getScratchItems } from "@/lib/supabase/actions";
 
 const typeColors: Record<string, string> = {
-  소설: "bg-emerald-500/20 text-emerald-300",
-  영화: "bg-blue-500/20 text-blue-300",
-  게임: "bg-purple-500/20 text-purple-300",
-  음악: "bg-pink-500/20 text-pink-300",
-  책: "bg-yellow-500/20 text-yellow-300",
-  기타: "bg-gray-500/20 text-gray-300",
+  소설: "bg-secondary/40 text-foreground/80",
+  영화: "bg-secondary/40 text-foreground/80",
+  게임: "bg-secondary/40 text-foreground/80",
+  음악: "bg-primary/20 text-accent",
+  책: "bg-primary/20 text-accent",
+  기타: "bg-secondary/40 text-muted-foreground",
 };
 
 interface DisplayRef extends RefData {

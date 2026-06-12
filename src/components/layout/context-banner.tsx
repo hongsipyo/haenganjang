@@ -56,13 +56,13 @@ export function ContextBanner() {
   if (!activity) {
     return (
       <div className="mx-4 mt-4 mb-2">
-        <div className="rounded-xl bg-gradient-to-r from-amber-50 via-rose-50 to-yellow-50 border border-amber-200/50 px-5 py-3 flex items-center justify-between">
-          <p className="text-sm text-amber-800">
+        <div className="rounded-xl bg-gradient-to-r from-primary/15 via-accent/10 to-primary/15 border border-primary/25 px-5 py-3 flex items-center justify-between">
+          <p className="text-sm text-primary">
             오늘 첫 작업을 시작해볼까?
           </p>
           <Link
             href="/brainstorm"
-            className="inline-flex items-center gap-1 text-sm font-medium text-rose-600 hover:text-rose-700 transition-colors"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary transition-colors"
           >
             시작하기
             <ArrowRight className="w-3.5 h-3.5" />
@@ -74,18 +74,18 @@ export function ContextBanner() {
 
   return (
     <div className="mx-4 mt-4 mb-2">
-      <div className="rounded-xl bg-gradient-to-r from-amber-50 via-rose-50 to-yellow-50 border border-amber-200/50 px-5 py-3 flex items-center justify-between gap-4">
+      <div className="rounded-xl bg-gradient-to-r from-primary/15 via-accent/10 to-primary/15 border border-primary/25 px-5 py-3 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 min-w-0">
-          <Clock className="w-4 h-4 text-amber-500 shrink-0" />
-          <p className="text-sm text-amber-800 truncate">
-            <span className="text-amber-600 font-medium">마지막 작업:</span>{" "}
+          <Clock className="w-4 h-4 text-primary shrink-0" />
+          <p className="text-sm text-primary truncate">
+            <span className="text-primary font-medium">마지막 작업:</span>{" "}
             {activity.detail} —{" "}
-            <span className="text-rose-500">{timeAgo(activity.created_at)}</span>
+            <span className="text-primary">{timeAgo(activity.created_at)}</span>
           </p>
         </div>
         <Link
           href={sectionToPath(activity.section)}
-          className="inline-flex items-center gap-1 text-sm font-medium text-rose-600 hover:text-rose-700 transition-colors whitespace-nowrap shrink-0"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary transition-colors whitespace-nowrap shrink-0"
         >
           이어서 하기
           <ArrowRight className="w-3.5 h-3.5" />

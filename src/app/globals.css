@@ -4,26 +4,31 @@
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 20% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 12%;
-    --primary: 220 70% 45%;
+    /* 딥 차콜/블랙 + 네온 레드 + 일렉트릭 옐로 — B급 정치풍자 포스터 */
+    --background: 220 14% 6%;
+    --foreground: 48 30% 92%;
+    --card: 220 13% 10%;
+    --card-foreground: 48 30% 92%;
+    --popover: 220 14% 8%;
+    --popover-foreground: 48 30% 92%;
+    --primary: 0 84% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 92%;
-    --secondary-foreground: 220 20% 20%;
-    --muted: 220 10% 94%;
-    --muted-foreground: 220 10% 45%;
-    --accent: 0 65% 52%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 220 70% 45%;
-    --radius: 0.5rem;
+    --secondary: 220 12% 16%;
+    --secondary-foreground: 48 20% 86%;
+    --muted: 220 10% 15%;
+    --muted-foreground: 48 8% 62%;
+    --accent: 48 96% 56%;
+    --accent-foreground: 220 30% 8%;
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 12% 20%;
+    --input: 220 12% 18%;
+    --ring: 0 84% 55%;
+    --radius: 0.85rem;
+
+    --neon-red: 0 90% 58%;
+    --electric-yellow: 48 96% 56%;
+    --charcoal: 220 14% 6%;
   }
 }
 
@@ -33,5 +38,51 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(1100px 620px at 82% -12%, hsl(0 85% 38% / 0.42), transparent 58%),
+      radial-gradient(820px 520px at 2% 4%, hsl(48 90% 45% / 0.14), transparent 56%),
+      radial-gradient(700px 700px at 50% 120%, hsl(0 80% 30% / 0.20), transparent 60%);
+    background-attachment: fixed;
   }
+}
+
+@layer utilities {
+  /* 네온 레드→옐로 그라데이션 텍스트 */
+  .text-neon {
+    background: linear-gradient(100deg, hsl(0 90% 60%), hsl(18 95% 58%) 45%, hsl(48 96% 58%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* 차콜 글래스 카드 */
+  .glass {
+    background: linear-gradient(160deg, hsl(220 13% 12% / 0.86), hsl(220 16% 7% / 0.88));
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(0 80% 55% / 0.14);
+  }
+  .glow-red {
+    box-shadow: 0 0 0 1px hsl(0 84% 55% / 0.30), 0 14px 44px hsl(0 80% 35% / 0.42);
+  }
+  .glow-yellow {
+    box-shadow: 0 0 26px hsl(48 96% 52% / 0.40);
+  }
+  /* 진행바 샤인: 레드→옐로 */
+  .progress-shine {
+    background: linear-gradient(90deg, hsl(0 84% 54%), hsl(20 92% 56%) 55%, hsl(48 96% 56%));
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.42), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 2.4s infinite;
+  }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+  @keyframes float-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-float-up { animation: float-up 0.7s ease-out both; }
+  @keyframes flicker { 0%,100% { opacity: 1; } 48% { opacity: 0.72; } 52% { opacity: 0.95; } }
+  .animate-flicker { animation: flicker 1.6s ease-in-out infinite; }
 }
