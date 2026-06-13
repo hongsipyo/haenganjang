@@ -180,6 +180,17 @@ export async function getFragments() {
   return (data ?? []) as Record<string, unknown>[];
 }
 
+// MCP·채팅·코워크가 save_world_item으로 저장한 세계관 항목(category=작품) 읽기 (양방향)
+export async function getWorldItems() {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("world_items" as never)
+    .select("*")
+    .eq("category" as never, PROJECT as never)
+    .order("created_at" as never, { ascending: false } as never);
+  return (data ?? []) as Record<string, unknown>[];
+}
+
 // --------------- Scratch ---------------
 
 export async function saveScratch(content: string) {

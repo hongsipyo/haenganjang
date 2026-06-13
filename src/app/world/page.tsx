@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Globe, ImageIcon, Music, FileText, Plus, ExternalLink, Trash2, Save, Loader2, Check } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-import { saveScratch, getScratchItems, deleteScratch } from "@/lib/supabase/actions";
+import { saveScratch, getScratchItems, deleteScratch, getWorldItems } from "@/lib/supabase/actions";
 
 const MARKER_NOTES = "[world:notes]";
 const MARKER_MUSIC = "[world:music]";
@@ -51,6 +51,12 @@ export default function WorldPage() {
   const [musicSaving, setMusicSaving] = useState(false);
   const [musicSaved, setMusicSaved] = useState(false);
   const [, setLoaded] = useState(false);
+
+  // MCP·채팅·코워크가 저장한 세계관 항목(world_items, category=haenganjang) — 양방향
+  const [worldItems, setWorldItems] = useState<Record<string, unknown>[]>([]);
+  useEffect(() => {
+    getWorldItems().then(setWorldItems).catch(() => {});
+  }, []);
 
   // Load saved data on mount
   useEffect(() => {
@@ -183,6 +189,10 @@ export default function WorldPage() {
           <TabsTrigger value="notes" className="gap-1.5">
             <FileText className="w-3.5 h-3.5" />
             메모
+          </TabsTrigger>
+          <TabsTrigger value="items" className="gap-1.5">
+            <Globe className="w-3.5 h-3.5" />
+            설정 {worldItems.length > 0 && <span className="ml-0.5 text-[10px] text-neon">{worldItems.length}</span>}
           </TabsTrigger>
         </TabsList>
 
@@ -345,6 +355,27 @@ export default function WorldPage() {
               />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="items">
+          {worldItems.length === 0 ? (
+            <p className="text-sm text-muted-foreground/60 py-8 text-center">
+              채팅·코워크에서 저장한 세계관 설정이 여기 모입니다.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {worldItems.map((item, i) => (
+                <Card key={(item.id as string) ?? i} className="border-primary/20">
+                  <CardContent className="p-4">
+                    {item.note ? (
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neon">{item.note as string}</p>
+                    ) : null}
+                    <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">{item.content as string}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

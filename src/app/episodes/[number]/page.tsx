@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { EPISODES } from "@/lib/data";
-import { getScratchItems, saveScratch, deleteScratch, logActivity } from "@/lib/supabase/actions";
+import { getScratchItems, saveScratch, deleteScratch, logActivity, getScenes, saveScene, updateScene } from "@/lib/supabase/actions";
 
 type SaveState = "idle" | "saving" | "saved";
 
@@ -36,6 +36,10 @@ export default function EpisodeDetailPage() {
   const [progress, setProgress] = useState(ep?.progress ?? 0);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [, setLoaded] = useState(false);
+
+  // 회차 본문 — written_scenes(prompt_id=haenganjang). MCP·채팅·코워크가 쓴 본문을 여기서 읽고 쓴다(양방향).
+  const [body, setBody] = useState("");
+  const [bodySceneId, setBodySceneId] = useState<string | null>(null);
 
   // Track scratch IDs so we can delete old values before saving new ones
   const [scratchIds, setScratchIds] = useState<Record<string, string>>({});
@@ -76,6 +80,16 @@ export default function EpisodeDetailPage() {
         }
 
         setScratchIds(ids);
+
+        // 회차 본문 로드 (written_scenes — MCP/채팅이 쓴 본문)
+        const scenes = await getScenes();
+        if (!cancelled) {
+          const mine = scenes.filter((s) => s.episode_number === ep!.number);
+          if (mine.length) {
+            setBody(mine.map((s) => s.content).filter(Boolean).join("\n\n"));
+            setBodySceneId(mine[0].id);
+          }
+        }
       } catch (err) {
         console.error("Failed to load episode data:", err);
       } finally {
@@ -120,6 +134,17 @@ export default function EpisodeDetailPage() {
       }
 
       setScratchIds((prev) => ({ ...prev, ...newIds }));
+
+      // 회차 본문 저장 (written_scenes — MCP writeEpisode와 동일하게 scene_order=0 단일행 upsert)
+      if (body.trim() || bodySceneId) {
+        if (bodySceneId) {
+          await updateScene(bodySceneId, { content: body, title: title || `${ep.number}부` });
+        } else {
+          const saved = await saveScene({ title: title || `${ep.number}부`, content: body, episode_number: ep.number });
+          if (saved?.id) setBodySceneId(saved.id);
+        }
+      }
+
       await logActivity("episode_saved", `${ep.number}부 저장`, "episodes");
 
       setSaveState("saved");
@@ -128,7 +153,7 @@ export default function EpisodeDetailPage() {
       console.error("Failed to save episode:", err);
       setSaveState("idle");
     }
-  }, [ep, title, synopsis, progress, scratchIds, saveState]);
+  }, [ep, title, synopsis, progress, scratchIds, saveState, body, bodySceneId]);
 
   if (!ep) {
     return (
@@ -209,6 +234,21 @@ export default function EpisodeDetailPage() {
             onChange={(e) => setSynopsis(e.target.value)}
             className="min-h-[100px] text-sm leading-relaxed border-none bg-transparent p-0 resize-none focus-visible:ring-0"
             placeholder="이 회차의 시놉시스..."
+          />
+        </CardContent>
+      </Card>
+
+      {/* 본문 — written_scenes 연동 (MCP·채팅·코워크와 양방향) */}
+      <Card className="mb-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">본문</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            className="min-h-[260px] text-sm leading-relaxed border-none bg-transparent p-0 resize-none focus-visible:ring-0"
+            placeholder="여기에 회차 본문을 쓰거나, 채팅·코워크에서 쓴 본문이 자동으로 불러와집니다…"
           />
         </CardContent>
       </Card>

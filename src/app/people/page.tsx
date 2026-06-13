@@ -38,7 +38,22 @@ export default function PeoplePage() {
             animal: override.animal !== undefined ? (override.animal as string | null) : char.animal,
           };
         });
-        setCharacters(merged);
+        // MCP·채팅·코워크가 추가한 신규 인물(details.work=haenganjang, 하드코딩에 없음)도 합친다 (양방향)
+        const existing = new Set(CHARACTERS.map((c) => c.name));
+        const extras: CharacterData[] = Object.values(overrides)
+          .filter((o) => ((o.details as Record<string, string> | undefined)?.work === "haenganjang") && !!o.name && !existing.has(o.name as string))
+          .map((o) => ({
+            id: o.name as string,
+            name: o.name as string,
+            description: (o.description as string) ?? "",
+            element: (o.element as string | null) ?? null,
+            animal: (o.animal as string | null) ?? null,
+            details: (o.details as Record<string, string>) ?? {},
+            relationships: [],
+            notes: (o.notes as string) ?? "",
+            keyLines: [],
+          }));
+        setCharacters([...merged, ...extras]);
       } catch {
         // DB unavailable — keep hardcoded only
       }
